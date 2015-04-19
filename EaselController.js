@@ -20,6 +20,10 @@ define([
         Vertex.useStage(stage);
         setStageListeners();
         stage.update();
+        var codeMirror = CodeMirror(document.body, {
+            value : '// Code goes here',
+            mode  : 'javascript'
+        });
 
         /* *********************************** Define modalities **************************************/
         var mode_placeVertices = {
