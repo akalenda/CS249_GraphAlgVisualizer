@@ -25,9 +25,14 @@ define([
         /**
          * Outgoing edges, indexed by their destination vertices
          * @type {Map.<Vertex,Edge>}
-         * @private
          */
         this.outgoingEdges = new Map();
+
+        /**
+         * Incoming edges, indexed by their source vertices
+         * @type {Map.<Vertex,Edge>}
+         */
+        this.incomingEdges = new Map();
 
         Vertex.list.push(this);
 
@@ -115,7 +120,7 @@ define([
         edgeMap.forEach(function completelyRemove(ignored, edge){
             var otherVertex = (edge.startVertex == that) ? edge.endVertex : edge.startVertex;
             edge.remove();
-            otherVertex.removeEdgeTo(that);
+            otherVertex.removeOutgoingEdgeTo(that);
         });
         Vertex._stage.removeChild(this._svgContainer);
         Vertex.list = Vertex.list.filter(function(a){return a !== that;});
@@ -189,27 +194,44 @@ define([
      * @param {Vertex} destinationVertex
      * @param {Edge} newEdge
      */
-    Vertex.prototype.addEdge = function addEdge(destinationVertex, newEdge){
+    Vertex.prototype.addOutgoingEdge = function addOutgoingEdge(destinationVertex, newEdge) {
         this.outgoingEdges.set(destinationVertex, newEdge);
+    };
+
+    Vertex.prototype.addIncomingEdge = function addIncomingEdge(sourceVertex, newEdge) {
+        this.incomingEdges.set(sourceVertex, newEdge);
     };
 
     /**
      * @param otherVertex
      * @returns {Edge}
      */
-    Vertex.prototype.getEdgeTo = function getEdgeTo(otherVertex){
+    Vertex.prototype.getOutgoingEdgeTo = function getEdgeTo(otherVertex){
         if (this.outgoingEdges)
             return this.outgoingEdges.get(otherVertex);
+    };
+
+    Vertex.prototype.getIncomingEdgeFrom = function getIncomingEdgeFrom(otherVertex) {
+        if (this.incomingEdges)
+            return this.incomingEdges.get(otherVertex);
     };
 
     /**
      * @param {Vertex} otherVertex
      */
-    Vertex.prototype.removeEdgeTo = function removeEdgeTo(otherVertex){
-        var edgeToRemove = this.getEdgeTo(otherVertex);
+    Vertex.prototype.removeOutgoingEdgeTo = function removeOutgoingEdgeTo(otherVertex) {
+        var edgeToRemove = this.getOutgoingEdgeTo(otherVertex);
         if (!edgeToRemove)
             return;
         this.outgoingEdges.delete(otherVertex);
+        edgeToRemove.remove();
+    };
+
+    Vertex.prototype.removeIncomingEdgeFrom = function removeIncomingEdgeFrom(otherVertex) {
+        var edgeToRemove = this.getIncomingEdgeFrom(otherVertex);
+        if (!edgeToRemove)
+            return;
+        this.incomingEdges.delete(otherVertex);
         edgeToRemove.remove();
     };
 

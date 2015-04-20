@@ -41,7 +41,7 @@ define([
     ProtoEdge.prototype.completeRemovalAt = function completeRemoveAt(endVertex){
         if (this._startVertex == endVertex)
             return;
-        this._startVertex.removeEdgeTo(endVertex);
+        this._startVertex.removeOutgoingEdgeTo(endVertex);
         this.remove();
     };
 

@@ -15,9 +15,12 @@ define([
         this._shape = createGfxElementAt(startVertex, endVertex);
         Vertex._stage.addChildAt(this._shape, 0);
 
-        startVertex.addEdge(endVertex, this);
-        if (this.isUndirected)
-            endVertex.addEdge(startVertex, this);
+        startVertex.addOutgoingEdge(endVertex, this);
+        endVertex.addIncomingEdge(startVertex, this);
+        if (this.isUndirected) {
+            endVertex.addOutgoingEdge(startVertex, this);
+            startVertex.addIncomingEdge(endVertex, this);
+        }
     }
 
     /**
@@ -28,9 +31,12 @@ define([
             return;
         Vertex._stage.removeChild(this._shape);
         this._shape = null;
-        this.startVertex.removeEdgeTo(this.endVertex);
-        if (this.isUndirected)
-            this.endVertex.removeEdgeTo(this.startVertex);
+        this.startVertex.removeOutgoingEdgeTo(this.endVertex);
+        this.endVertex.removeIncomingEdgeFrom(this.startVertex);
+        if (this.isUndirected) {
+            this.endVertex.removeOutgoingEdgeTo(this.startVertex);
+            this.startVertex.removeIncomingEdgeFrom(this.endVertex);
+        }
         this.startVertex = this.endVertex = null;
     };
 
