@@ -1,6 +1,7 @@
 define([
-    'jquery'
-], function ($) {
+    'jquery',
+    "Process"
+], function ($, Process) {
 
     /**
      * The radius of vertices as they appear on the canvas
@@ -23,10 +24,10 @@ define([
 
         /**
          * Outgoing edges, indexed by their destination vertices
-         * @type {Object.<Vertex,Edge>}
+         * @type {Map.<Vertex,Edge>}
          * @private
          */
-        this._edges = {};
+        this.outgoingEdges = new Map();
 
         Vertex.list.push(this);
 
@@ -60,6 +61,13 @@ define([
      */
     Vertex.useStage = function useStage(stage){
         Vertex._stage = stage;
+    };
+
+    /**
+     * @param {CodeEnclosure} codeEnclosure
+     */
+    Vertex.useCodeEnclosure = function useCodeEnclosure(codeEnclosure) {
+        Vertex._codeEnclosure = codeEnclosure;
     };
 
     /**
@@ -99,12 +107,12 @@ define([
      * Removes the vertex from the program. This includes both its graphical and algorithmic components, as well as any edges connected to it.
      */
     Vertex.prototype.remove = function remove(){
-        if(!this._edges)
+        if(!this.outgoingEdges)
             return;
-        var edgeList = this._edges;
+        var edgeMap = this.outgoingEdges;
         var that = this;
-        this._edges = null;
-        $.each(edgeList, function completelyRemove(ignored, edge){
+        this.outgoingEdges = null;
+        edgeMap.forEach(function completelyRemove(ignored, edge){
             var otherVertex = (edge.startVertex == that) ? edge.endVertex : edge.startVertex;
             edge.remove();
             otherVertex.removeEdgeTo(that);
@@ -125,7 +133,7 @@ define([
     Vertex.prototype.moveTo = function moveTo(xCoord, yCoord){
         this._svgContainer.x = xCoord;
         this._svgContainer.y = yCoord;
-        $.each(this._edges, function(ignored, edge){
+        this.outgoingEdges.forEach(function(ignored, edge){
             edge.updateGfxElements();
         });
     };
@@ -147,7 +155,6 @@ define([
         return 'p' + this.getID();
     };
 
-    /* ************************ Graph-algorithmic stuff ***************************************/
     resetVertexList();
 
     /**
@@ -183,7 +190,7 @@ define([
      * @param {Edge} newEdge
      */
     Vertex.prototype.addEdge = function addEdge(destinationVertex, newEdge){
-        this._edges[destinationVertex] = newEdge;
+        this.outgoingEdges.set(destinationVertex, newEdge);
     };
 
     /**
@@ -191,8 +198,8 @@ define([
      * @returns {Edge}
      */
     Vertex.prototype.getEdgeTo = function getEdgeTo(otherVertex){
-        if (this._edges)
-            return this._edges[otherVertex];
+        if (this.outgoingEdges)
+            return this.outgoingEdges.get(otherVertex);
     };
 
     /**
@@ -202,19 +209,22 @@ define([
         var edgeToRemove = this.getEdgeTo(otherVertex);
         if (!edgeToRemove)
             return;
-        delete this._edges[otherVertex];
+        this.outgoingEdges.delete(otherVertex);
         edgeToRemove.remove();
     };
 
-    /**
-     * @param {Vertex} otherVertex
-     * @returns {boolean}
-     */
-    Vertex.prototype.hasEdgeTo = function hasEdgeTo(otherVertex){
-        for (var i=0; i<this._edges.length; i++)
-            if(this._edges[i].isOutgoingTo(otherVertex))
-                return true;
-        return false;
+    /* ********************************** Simulation ********************************************/
+    Vertex.prototype.sim_initialize = function sim_initialize() {
+        this._process = new Process(this);
+        Vertex._codeEnclosure.initializer(this._process);
+    };
+
+    Vertex.prototype.sim_initiate = function sim_initiate() {
+        Vertex._codeEnclosure.initiator(this._process);
+    };
+
+    Vertex.prototype.sim_receiveMessageFrom = function sim_receiveMessageFrom(sourceVertex, message) {
+        Vertex._codeEnclosure.msgReceiver(this._process, message, sourceVertex.toString());
     };
 
     /* ********************************* Private Helpers *****************************************/

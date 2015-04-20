@@ -1,10 +1,12 @@
 define([
     "Vertex",
-    "ProtoEdge"
-], function (Vertex, ProtoEdge) {
+    "ProtoEdge",
+    "CodeEnclosure"
+], function (Vertex, ProtoEdge, CodeEnclosure) {
     'use strict';
 
     var module = angular.module('GraphAlgVisualizer', []);
+
     angular.element(document).ready(function () {
         angular.bootstrap(document, ['GraphAlgVisualizer']);
     });
@@ -21,7 +23,7 @@ define([
         setStageListeners();
         stage.update();
         var codeMirror = CodeMirror(document.body, {
-            value : '// Code goes here',
+            value : '// Code goes here\n',
             mode  : 'javascript'
         });
 
@@ -175,6 +177,21 @@ define([
         function unmarkInitiator(ignored, vertex) {
             vertex.unmarkAsInitiator();
         }
+
+        /* *************************** Code mirror stuff *****************************************/
+        this.alg_reset = function alg_reset(){
+            debugger;
+        };
+
+        this.alg_run = function alg_run(){
+            Vertex.useCodeEnclosure(new CodeEnclosure(codeMirror.getValue()));
+            Vertex.list.forEach(function(vertex){
+                vertex.sim_initialize();
+            });
+            Vertex.list.getInitiators().forEach(function(vertex){
+                vertex.sim_initiate();
+            });
+        };
 
         /* ********************************* Helpers ******************************************/
         /**

@@ -90,21 +90,65 @@ define([
         }
     };
 
+    /**
+     *
+     * @param {Vertex} sourceVertex
+     * @param {string} message
+     */
+    Edge.prototype.simulateMessageSentFrom = function simulateMessageSentFrom(sourceVertex, message) {
+        var targetVertex = (sourceVertex == this.startVertex) ? this.endVertex : this.startVertex;
+        var startCoords = sourceVertex.getCoordinatesOfCenter();
+        var endCoords = targetVertex.getCoordinatesOfCenter();
+        var svgLine = createGfxElementAt(sourceVertex, sourceVertex, "Green");
+        var delta = 0.01; // TODO random between 0 and 1
+        var currentBias = 0.0;
+        Vertex._stage.addChild(svgLine);
+        function updateSvgLineOnTick(event) {
+            if (!event.paused) {
+                currentBias = Math.min(1.0, currentBias + delta);
+                var currentCoords = interpolateCoordinatesFrom(currentBias, startCoords, endCoords);
+                svgLine.graphics.instructions[1].x = currentCoords.x;
+                svgLine.graphics.instructions[1].y = currentCoords.y;
+                Vertex._stage.update();
+                if (currentBias == 1.0) {
+                    createjs.Ticker.removeEventListener("tick", updateSvgLineOnTick);
+                    targetVertex.sim_receiveMessageFrom(sourceVertex, message);
+                }
+            }
+        }
+        createjs.Ticker.addEventListener("tick", updateSvgLineOnTick);
+    };
+
     /* ******************************* Helpers ********************************/
     /**
      * @param {Vertex} startVertex
      * @param {Vertex} endVertex
+     * @param {string} color - Any CSS-recognized color
      * @returns {*} - the EaselJS GUI object for this Edge's line
      */
-    function createGfxElementAt(startVertex, endVertex){
+    function createGfxElementAt(startVertex, endVertex, color){
         var startCoords = startVertex.getCoordinatesOfCenter();
         var endCoords = endVertex.getCoordinatesOfCenter();
         var gfx = new createjs.Graphics();
         gfx.setStrokeStyle(3)
-            .beginStroke("white")
+            .beginStroke(color || "white")
             .moveTo(startCoords.x, startCoords.y)
             .lineTo(endCoords.x, endCoords.y);
         return new createjs.Shape(gfx);
+    }
+
+    /**
+     *
+     * @param bias
+     * @param {{x: number, y: number}} a
+     * @param {{x: number, y: number}} b
+     * @returns {{x: number, y: number}}
+     */
+    function interpolateCoordinatesFrom(bias, a, b) {
+        return {
+            x : (bias * b.x) + ((1 - bias) * a.x),
+            y : (bias * b.y) + ((1 - bias) * a.y)
+        };
     }
 
     return Edge;
