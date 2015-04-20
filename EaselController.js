@@ -50,20 +50,24 @@ define([
             releaseOnEmpty: cancelDrawingEdge
         };
 
+        var mode_markInitiators = {
+            clickOnVertex: markInitiator,
+            dragFromVertex: moveVertex
+        };
+
+        var mode_unmarkInitiators = {
+            clickOnVertex: unmarkInitiator,
+            dragFromVertex: moveVertex
+        };
+
         var currentMode = mode_placeVertices;
 
-        this.enterMode_placeVertices = function enterMode_placeVertices() {
-            currentMode = mode_placeVertices;
-        };
-        this.enterMode_removeVertices = function enterMode_removeVertices() {
-            currentMode = mode_removeVertices;
-        };
-        this.enterMode_drawEdges = function enterMode_drawEdges() {
-            currentMode = mode_drawEdges;
-        };
-        this.enterMode_removeEdges = function enterMode_removeEdges() {
-            currentMode = mode_removeEdges;
-        };
+        this.enterMode_placeVertices    = function enterMode_placeVertices   () {currentMode = mode_placeVertices   ;};
+        this.enterMode_removeVertices   = function enterMode_removeVertices  () {currentMode = mode_removeVertices  ;};
+        this.enterMode_drawEdges        = function enterMode_drawEdges       () {currentMode = mode_drawEdges       ;};
+        this.enterMode_removeEdges      = function enterMode_removeEdges     () {currentMode = mode_removeEdges     ;};
+        this.enterMode_markInitiators   = function enterMode_markInitiators  () {currentMode = mode_markInitiators  ;};
+        this.enterMode_unmarkInitiators = function enterMode_unmarkInitiators() {currentMode = mode_unmarkInitiators;};
 
         /* ********************************** Define functionalities ********************************************/
 
@@ -78,7 +82,8 @@ define([
          * @param {number} yCoord
          */
         function createVertex(xCoord, yCoord) {
-            new Vertex(xCoord, yCoord, vertexListener);
+            new Vertex(xCoord, yCoord)
+                .addListener(vertexListener);
         }
 
         /**
@@ -153,6 +158,22 @@ define([
             if (!protoEdge)
                 return;
             protoEdge = protoEdge.remove();
+        }
+
+        /**
+         * @param ignored
+         * @param {Vertex} vertex
+         */
+        function markInitiator(ignored, vertex) {
+            vertex.markAsInitiator();
+        }
+
+        /**
+         * @param ignored
+         * @param {Vertex} vertex
+         */
+        function unmarkInitiator(ignored, vertex) {
+            vertex.unmarkAsInitiator();
         }
 
         /* ********************************* Helpers ******************************************/

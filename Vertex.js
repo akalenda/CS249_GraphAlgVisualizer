@@ -12,12 +12,14 @@ define([
     /**
      * @param {number} xCoord
      * @param {number} yCoord
-     * @param {function} VertexListener
      * @constructor
      */
-    function Vertex(xCoord, yCoord, VertexListener) {
+    function Vertex(xCoord, yCoord) {
         var that = this;
         this._text = null;
+        this._svgStar = null;
+        this._svgContainer = null;
+        this._listeners = [];
 
         /**
          * Outgoing edges, indexed by their destination vertices
@@ -29,9 +31,9 @@ define([
         Vertex.list.push(this);
 
         this._svgContainer = addGraphicalElements(this, xCoord, yCoord);
-        this._svgContainer.on('click'    , passEventToListener);
-        this._svgContainer.on('pressmove', passEventToListener);
-        this._svgContainer.on('pressup'  , passEventToListener);
+        this._svgContainer.on('click'    , passEventToListeners);
+        this._svgContainer.on('pressmove', passEventToListeners);
+        this._svgContainer.on('pressup'  , passEventToListeners);
 
         /**
          * We place this reference here so that when EaselJS produces the container as a search result, we can trace it back to this Vertex.
@@ -40,23 +42,57 @@ define([
         this._svgContainer.owningVertex = this;
 
         /**
-         * TODO describe
+         * @callback Vertex~passEventToListeners
          * @param event
-         * @returns {*}
          */
-        function passEventToListener(event){
-            return VertexListener(event, that);
+        function passEventToListeners(event){
+            that._listeners.forEach(function(listener){
+                listener(event, that);
+            });
         }
     }
 
     /* ************************ GUI stuff *****************************************************/
 
     /**
-     * This needs to be set before you can start creating Vertex's
+     * This needs to be set before you can start creating vertices
      * @param stage - From EaselJS
      */
     Vertex.useStage = function useStage(stage){
         Vertex._stage = stage;
+    };
+
+    /**
+     * Add a listener that will be invoked when this Vertex receives a mouse event, e.g. it is clicked on, dragged, etc
+     * @param {Vertex~passEventToListeners} foo
+     */
+    Vertex.prototype.addListener = function addListener(foo){
+        if(!$.isFunction(foo))
+            throw new Error("addListener was not given a function, instead received the following: " + foo);
+        this._listeners.push(foo);
+    };
+
+    /**
+     * Add this as a graph algorithm initiator
+     */
+    Vertex.prototype.markAsInitiator = function markAsInitiator(){
+        this._svgStar = createGfx_star(this);
+        this._svgContainer.addChild(this._svgStar);
+    };
+
+    /**
+     * Remove this as a graph algorithm initiator
+     */
+    Vertex.prototype.unmarkAsInitiator = function unmarkAsInitiator(){
+        this._svgContainer.removeChild(this._svgStar);
+        this._svgStar = null;
+    };
+
+    /**
+     * @returns {boolean} - True if this vertex has been marked as an initiator, false otherwise
+     */
+    Vertex.prototype.isInitiator = function isInitiator(){
+        return !!this._svgStar;
     };
 
     /**
@@ -112,12 +148,28 @@ define([
     };
 
     /* ************************ Graph-algorithmic stuff ***************************************/
+    resetVertexList();
 
     /**
-     * The list of all active Vertex's
-     * @type {Array<Vertex>}
+     * Initializes/resets Vertex.list
      */
-    Vertex.list = [];
+    function resetVertexList(){
+        /**
+         * The list of all active Vertex's
+         * @type {Array<Vertex>}
+         */
+        Vertex.list = [];
+
+        /**
+         * Returns the list of Vertices that are marked as graph algorithm initiators
+         * @returns {Array.<Vertex>}
+         */
+        Vertex.list.getInitiators = function getInitiators(){
+            return Vertex.list.filter(function(vertex){
+                return vertex.isInitiator();
+            });
+        };
+    }
 
     /**
      * @returns {number}
@@ -187,6 +239,24 @@ define([
         that._text.textAlign = "center";
         that._text.y = -(CIRCLE_RADIUS / 2);
         return that._text;
+    }
+
+    /**
+     * @param {number} [xCoord]
+     * @param {number} [yCoord]
+     * @param {Vertex} that
+     */
+    function createGfx_star(that, xCoord, yCoord){
+        xCoord = xCoord || -CIRCLE_RADIUS * 0.8;
+        yCoord = yCoord || -CIRCLE_RADIUS * 0.8;
+        var star = new createjs.Shape();
+        var coreRadius = CIRCLE_RADIUS / 2;
+        var numPoints = 5;
+        var pointLength = CIRCLE_RADIUS / 8;
+        var rotationAngle = 0;
+        star.graphics.beginFill("Aquamarine").drawPolyStar(xCoord, yCoord, coreRadius, numPoints, pointLength, rotationAngle);
+        star.owningVertex = that;
+        return star;
     }
 
     /**
