@@ -180,10 +180,14 @@ define([
 
         /* *************************** Code mirror stuff *****************************************/
         this.alg_reset = function alg_reset(){
-            debugger;
+            Vertex.list.forEach(function(vertex){
+                vertex.sim_reset();
+            });
+            stage.update();
         };
 
         this.alg_run = function alg_run(){
+            this.alg_reset();
             Vertex.useCodeEnclosure(new CodeEnclosure(codeMirror.getValue()));
             Vertex.list.forEach(function(vertex){
                 vertex.sim_initialize();

@@ -239,17 +239,35 @@ define([
     };
 
     /* ********************************** Simulation ********************************************/
+    Vertex.prototype.sim_reset = function sim_reset() {
+        if (this._process)
+            this._process = null;
+        if (this._sim_listener) {
+            createjs.Ticker.removeEventListener('tick', this._sim_listener);
+            updateShapeGradient(this._svgContainer.getChildByName("circle"), 0);
+        }
+        this.outgoingEdges.forEach(function (edge, ignoredVertex) {
+            edge.sim_reset();
+        });
+        this.incomingEdges.forEach(function (edge, ignoredVertex) {
+            edge.sim_reset();
+        });
+    };
+
     Vertex.prototype.sim_initialize = function sim_initialize() {
         this._process = new Process(this);
-        Vertex._codeEnclosure.initializer(this._process);
+        if (Vertex._codeEnclosure.initializer)
+            Vertex._codeEnclosure.initializer(this._process);
     };
 
     Vertex.prototype.sim_initiate = function sim_initiate() {
-        Vertex._codeEnclosure.initiator(this._process);
+        if (Vertex._codeEnclosure.initiator)
+            Vertex._codeEnclosure.initiator(this._process);
     };
 
     Vertex.prototype.sim_receiveMessageFrom = function sim_receiveMessageFrom(sourceVertex, message) {
-        Vertex._codeEnclosure.msgReceiver(this._process, message, sourceVertex.toString());
+        if (Vertex._codeEnclosure.msgReceiver)
+            Vertex._codeEnclosure.msgReceiver(this._process, message, sourceVertex.toString());
     };
 
     Vertex.prototype.sim_terminate = function sim_terminate() {
@@ -264,20 +282,20 @@ define([
         var that = this;
         var percentDone = 0;
         var delta = .03;
-        function updateSvgFillOnTick(event) {
+        this._sim_listener = function updateSvgFillOnTick(event) {
             if (!event.paused) {
                 percentDone = Math.min(1, percentDone + delta);
-                var circle = that._svgContainer.getChildByName("circle");
-                updateShapeGradient(circle, percentDone);
+                updateShapeGradient(that._svgContainer.getChildByName("circle"), percentDone);
                 updateStage();
                 if (percentDone == 1)
-                    createjs.Ticker.removeEventListener('tick', updateSvgFillOnTick);
+                    createjs.Ticker.removeEventListener('tick', that._sim_listener);
             }
-        }
-        createjs.Ticker.addEventListener('tick', updateSvgFillOnTick);
+        };
+        createjs.Ticker.addEventListener('tick', this._sim_listener);
     };
 
     /* ********************************* Private Helpers *****************************************/
+
     /**
      * Causes the EaselJS stage to update, redrawing everything as needed. Try to avoid using it. It's often already
      * being done further up the call stack anyway, which is better as that is more likely to capture multiple stage
