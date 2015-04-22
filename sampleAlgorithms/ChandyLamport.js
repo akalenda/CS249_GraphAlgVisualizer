@@ -1,11 +1,14 @@
-randomizeTraversalTimes();
-randomizeProcessTimes();
-
-/**
+/*
  * @fileoverview The Chandy-Lamport snapshot algorithm, one of the most basic distributed algorithms
  * as described in Wan Fokkink's "Distributed Algorithms: An Intuitive Approach"
  */
 
+//noinspection JSUnresolvedFunction
+randomizeTraversalTimes();
+//noinspection JSUnresolvedFunction
+randomizeProcessTimes();
+
+//noinspection JSUnresolvedFunction
 onInitializationDo(function (p) {
 
     /**
@@ -38,10 +41,12 @@ onInitializationDo(function (p) {
  * If p wants to initiate a network-wide snapshot,
  * then TakeSnapshot process
  */
+//noinspection JSUnresolvedFunction
 onInitiationDo(function (p) {
     takeSnapshot(p);
 });
 
+//noinspection JSUnresolvedFunction
 onReceivingMessageDo(function (p, message, channel) {
     /*
      * If p receives <marker> through an incoming channel,
@@ -51,7 +56,7 @@ onReceivingMessageDo(function (p, message, channel) {
      */
     if (message == "<marker>") {
         takeSnapshot(p);
-        p.marker = true;
+        p.marker[channel] = true;
         var allDone = p.everyIncomingChannel(function isDone(channel) {
             return p.marker[channel];
         });

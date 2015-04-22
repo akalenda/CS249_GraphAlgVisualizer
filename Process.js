@@ -1,6 +1,4 @@
-define([
-    'jquery'
-], function ($) {
+define([], function () {
     /**
      * An interface between the code folks might enter into CodeMirror and the Vertex class. Vertex is concerned with
      * administrating SVG elements and references to other internal data structures, as the internal representation
@@ -13,13 +11,13 @@ define([
     function Process(vertex) {
 
         this.forEachIncomingChannel = function forEachIncomingChannel(foo) {
-            vertex.incomingEdges.forEach(function(ignored, edge){
+            vertex.incomingEdges.forEach(function passAlongEdgeString(edge, ignoredVertex) {
                 foo(edge.toString());
             });
         };
 
         this.forEachOutgoingChannel = function forEachOutgoingChannel(foo) {
-            vertex.outgoingEdges.forEach(function(ignored, edge){
+            vertex.outgoingEdges.forEach(function passAlongEdgeString(edge, ignoredVertex) {
                 foo(edge.toString());
             });
         };
@@ -29,13 +27,31 @@ define([
         };
 
         this.everyOutgoingChannel = function everyOutgoingChannel(foo) {
-            return everyValueInMap(vertex.outgoingEdges).isEvaluatedTrueBy(foo);
+            return everyValueInMap(vertex.outgoingEdges).isEvaluatedTrueBy(function(edge){
+                foo(edge.toString());
+            });
         };
 
         this.sendEachOutgoingChannel = function sendEachOutgoingChannel(message) {
-            vertex.outgoingEdges.forEach(function(edge, ignoredVertex){
+            vertex.outgoingEdges.forEach(function (edge, ignoredVertex) {
                 edge.simulateMessageSentFrom(vertex, message);
             });
+        };
+
+        this.getNumOutgoingChannels = function getNumOutgoingChannels() {
+            return vertex.outgoingEdges.size;
+        };
+
+        this.getNumIncomingChannels = function getNumIncomingChannels() {
+            return vertex.incomingEdges.size;
+        };
+
+        this.decide = function decide() {
+            vertex.sim_decide();
+        };
+
+        this.terminate = function terminate() {
+            vertex.sim_terminate();
         };
 
         this.simulateBlockingProcess = function simulateBlockingProcess() {
@@ -44,6 +60,15 @@ define([
 
         this.simulateNonblockingProcess = function simulateNonblockingProcess() {
             vertex.simulateNonblockingProcess();
+        };
+
+        /**
+         *
+         * @param {string} otherProcess
+         * @param {string} message
+         */
+        this.send = function send(otherProcess, message) {
+            vertex.getOutgoingEdgeByString(otherProcess).simulateMessageSentFrom(vertex, message);
         };
 
         this.toString = function toString() {
@@ -59,11 +84,11 @@ define([
                 var iter = map.values();
                 var next = iter.next();
                 while (!next.done) {
-                    if (foo(next.value))
-                        return true;
+                    if (!foo(next.value))
+                        return false;
                     next = iter.next();
                 }
-                return false;
+                return true;
             }
         };
     }

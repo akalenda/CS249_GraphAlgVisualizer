@@ -4,7 +4,7 @@ define([
 ], function ($, Process) {
 
     var PROCESS_GRADIENT_COLORS = ['#8fdb85', '#8fdb85', '#bfffb7', '#c3baff', '#948ae2', '#948ae2'];
-
+    var PROCESS_GRADIENT_COLORS_TERMINATE = ['#ff5c5c', '#febbbb', '#febbbb', '#febbbb', '#febbbb', '#ff5c5c'];
     /**
      * The radius of vertices as they appear on the canvas
      * @type {number}
@@ -209,9 +209,21 @@ define([
      * @param otherVertex
      * @returns {Edge}
      */
-    Vertex.prototype.getOutgoingEdgeTo = function getEdgeTo(otherVertex){
+    Vertex.prototype.getOutgoingEdgeTo = function getEdgeTo(otherVertex) {
         if (this.outgoingEdges)
             return this.outgoingEdges.get(otherVertex);
+    };
+
+    Vertex.prototype.getOutgoingEdgeByString = function getOutgoingEdgeByString(edgeString) {
+        var iter = this.outgoingEdges.values();
+        var next = iter.next();
+        while (!next.done) {
+            var edge = next.value;
+            if (edge.toString() == edgeString)
+                return edge;
+            next = iter.next();
+        }
+        throw new Error("No edge '" + edgeString + "' outgoing from " + this.toString());
     };
 
     Vertex.prototype.getIncomingEdgeFrom = function getIncomingEdgeFrom(otherVertex) {
@@ -265,13 +277,16 @@ define([
             Vertex._codeEnclosure.initiator(this._process);
     };
 
-    Vertex.prototype.sim_receiveMessageFrom = function sim_receiveMessageFrom(sourceVertex, message) {
+    Vertex.prototype.sim_receiveMessageFrom = function sim_receiveMessageFrom(edge, message) {
         if (Vertex._codeEnclosure.msgReceiver)
-            Vertex._codeEnclosure.msgReceiver(this._process, message, sourceVertex.toString());
+            Vertex._codeEnclosure.msgReceiver(this._process, message, edge.toString());
     };
 
     Vertex.prototype.sim_terminate = function sim_terminate() {
-        debugger;
+        if (this._sim_listener)
+            createjs.Ticker.removeEventListener('tick', this._sim_listener);
+        updateShapeGradient(this._svgContainer.getChildByName("circle"), -1);
+        Vertex._stage.update();
     };
 
     Vertex.prototype.simulateBlockingProcess = function simulateBlockingProcess() {
@@ -309,6 +324,8 @@ define([
     }
 
     function updateShapeGradient(shape, percentComplete) {
+        var colors = (percentComplete < 0) ? PROCESS_GRADIENT_COLORS_TERMINATE : PROCESS_GRADIENT_COLORS;
+        percentComplete = (percentComplete < 0) ? 0.5 : percentComplete;
         var ratios = [
             0,
             Math.max(0.0, percentComplete / 2),
@@ -317,7 +334,7 @@ define([
             Math.min(1.0, (percentComplete + 1.0) / 2),
             1
         ];
-        shape.graphics.beginLinearGradientFill(PROCESS_GRADIENT_COLORS, ratios, 0, CIRCLE_RADIUS, 0, -CIRCLE_RADIUS);
+        shape.graphics.beginLinearGradientFill(colors, ratios, 0, CIRCLE_RADIUS, 0, -CIRCLE_RADIUS);
         shape.graphics.drawCircle(0, 0, CIRCLE_RADIUS); // TODO this line shouldnt be necessary, file a GitHub issue
     }
     

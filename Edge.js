@@ -124,6 +124,7 @@ define([
      * @param {string} message
      */
     Edge.prototype.simulateMessageSentFrom = function simulateMessageSentFrom(sourceVertex, message) {
+        var that = this;
         var targetVertex = (sourceVertex == this.startVertex) ? this.endVertex : this.startVertex;
         var startCoords = sourceVertex.getCoordinatesOfCenter();
         var endCoords = targetVertex.getCoordinatesOfCenter();
@@ -143,12 +144,12 @@ define([
                 svgLine.graphics.instructions[1].y = currentCoords.y;
                 svgSpark.graphics.instructions[1].x = svgSpark.graphics.instructions[2].x = currentCoords.x;
                 svgSpark.graphics.instructions[1].y = svgSpark.graphics.instructions[2].y = currentCoords.y;
-                Vertex._stage.update();
                 if (currentBias == 1.0) {
                     createjs.Ticker.off("tick", listener);
-                    targetVertex.sim_receiveMessageFrom(sourceVertex, message);
+                    targetVertex.sim_receiveMessageFrom(that, message);
                     svgContainer.removeChild(svgSpark);
                 }
+                Vertex._stage.update();
             }
         });
         this._sim_listeners.push(listener);
