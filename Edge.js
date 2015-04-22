@@ -13,6 +13,7 @@ define([
         this.startVertex = startVertex;
         this.endVertex = endVertex;
         this._shape = createGfxElementAt(startVertex, endVertex);
+        this._sim_listeners = [];
         Vertex._stage.addChildAt(this._shape, 0);
 
         startVertex.addOutgoingEdge(endVertex, this);
@@ -96,6 +97,11 @@ define([
         }
     };
 
+    /* *************************************** Simulation functions ********************************************/
+    Edge.prototype.sim_reset = function sim_reset() {
+        // TODO
+    };
+
     /**
      *
      * @param {Vertex} sourceVertex
@@ -122,7 +128,7 @@ define([
                 }
             }
         }
-        createjs.Ticker.addEventListener("tick", updateSvgLineOnTick);
+        createjs.Ticker.on("tick", updateSvgLineOnTick);
     };
 
     /* ******************************* Helpers ********************************/
