@@ -125,7 +125,7 @@ define([
             edge.remove();
         });
         Vertex._stage.removeChild(this._svgContainer);
-        Vertex.list = Vertex.list.filter(function(a){return a !== that;});
+        resetVertexList(Vertex.list.filter(function(a){return a !== that;}));
         Vertex.list.forEach(function(vertex){
             vertex._text.text = vertex.toString();
         });
@@ -167,13 +167,14 @@ define([
 
     /**
      * Initializes/resets Vertex.list
+     * @param {Array<Vertex>} [newList]
      */
-    function resetVertexList(){
+    function resetVertexList(newList){
         /**
          * The list of all active Vertex's
          * @type {Array<Vertex>}
          */
-        Vertex.list = [];
+        Vertex.list = newList || [];
 
         /**
          * Returns the list of Vertices that are marked as graph algorithm initiators
@@ -254,10 +255,9 @@ define([
     Vertex.prototype.sim_reset = function sim_reset() {
         if (this._process)
             this._process = null;
-        if (this._sim_listener) {
+        if (this._sim_listener)
             createjs.Ticker.removeEventListener('tick', this._sim_listener);
-            updateShapeGradient(this._svgContainer.getChildByName("circle"), 0);
-        }
+        updateShapeGradient(this._svgContainer.getChildByName("circle"), 0);
         this.outgoingEdges.forEach(function (edge, ignoredVertex) {
             edge.sim_reset();
         });
