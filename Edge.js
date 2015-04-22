@@ -2,6 +2,9 @@ define([
     'Vertex'
 ], function(Vertex){
 
+    var DEFAULT_LINE_COLOR = "White";
+    var SIM_MESSAGE_LINE_COLOR = "Green";
+
     /**
      * @param {Vertex} startVertex
      * @param {Vertex} endVertex
@@ -14,6 +17,7 @@ define([
         this.endVertex = endVertex;
         this._shape = createGfxElementAt(startVertex, endVertex);
         this._sim_listeners = [];
+        this._sim_svgLines = [];
         Vertex._stage.addChildAt(this._shape, 0);
 
         startVertex.addOutgoingEdge(endVertex, this);
@@ -54,6 +58,7 @@ define([
         this._shape.graphics.command.y = endCoords.y;
     };
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @param {Vertex} vertex
      * @returns {boolean}
@@ -64,6 +69,7 @@ define([
         return this.isUndirected && this.endVertex == vertex;
     };
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @param {Vertex} vertex
      * @returns {boolean}
@@ -81,6 +87,7 @@ define([
         return "e" + this.startVertex.getID() + "_" + this.endVertex.getID();
     };
 
+    //noinspection JSUnusedGlobalSymbols
     /**
      * @param {Edge} other
      * @returns {boolean} - Returns true if the other object is a functionally equivalent instance of Edge. E.g. It has the same start and endpoint, or if this is an undirected Edge, the two endpoints are interchangeable
@@ -99,7 +106,14 @@ define([
 
     /* *************************************** Simulation functions ********************************************/
     Edge.prototype.sim_reset = function sim_reset() {
-        // TODO
+        this._sim_listeners.forEach(function(listener){
+            createjs.Ticker.off("tick", listener);
+        });
+        this._sim_svgLines.forEach(function(svgLine){
+            Vertex._stage.removeChild(svgLine);
+        });
+        this._sim_listeners = [];
+        this._sim_svgLines = [];
     };
 
     /**
@@ -111,11 +125,11 @@ define([
         var targetVertex = (sourceVertex == this.startVertex) ? this.endVertex : this.startVertex;
         var startCoords = sourceVertex.getCoordinatesOfCenter();
         var endCoords = targetVertex.getCoordinatesOfCenter();
-        var svgLine = createGfxElementAt(sourceVertex, sourceVertex, "Green");
         var delta = 0.01; // TODO random between 0 and 1
         var currentBias = 0.0;
+        var svgLine = createGfxElementAt(sourceVertex, sourceVertex, SIM_MESSAGE_LINE_COLOR);
         Vertex._stage.addChild(svgLine);
-        function updateSvgLineOnTick(event) {
+        var listener = createjs.Ticker.on("tick", function updateSvgLineOnTick(event) {
             if (!event.paused) {
                 currentBias = Math.min(1.0, currentBias + delta);
                 var currentCoords = interpolateCoordinatesFrom(currentBias, startCoords, endCoords);
@@ -123,19 +137,20 @@ define([
                 svgLine.graphics.instructions[1].y = currentCoords.y;
                 Vertex._stage.update();
                 if (currentBias == 1.0) {
-                    createjs.Ticker.removeEventListener("tick", updateSvgLineOnTick);
+                    createjs.Ticker.off("tick", listener);
                     targetVertex.sim_receiveMessageFrom(sourceVertex, message);
                 }
             }
-        }
-        createjs.Ticker.on("tick", updateSvgLineOnTick);
+        });
+        this._sim_listeners.push(listener);
+        this._sim_svgLines.push(svgLine);
     };
 
     /* ******************************* Helpers ********************************/
     /**
      * @param {Vertex} startVertex
      * @param {Vertex} endVertex
-     * @param {string} color - Any CSS-recognized color
+     * @param {string} [color] - Any CSS-recognized color
      * @returns {*} - the EaselJS GUI object for this Edge's line
      */
     function createGfxElementAt(startVertex, endVertex, color){
@@ -143,7 +158,7 @@ define([
         var endCoords = endVertex.getCoordinatesOfCenter();
         var gfx = new createjs.Graphics();
         gfx.setStrokeStyle(3)
-            .beginStroke(color || "white")
+            .beginStroke(color || DEFAULT_LINE_COLOR)
             .moveTo(startCoords.x, startCoords.y)
             .lineTo(endCoords.x, endCoords.y);
         return new createjs.Shape(gfx);
