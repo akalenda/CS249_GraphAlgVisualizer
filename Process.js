@@ -10,6 +10,22 @@ define([], function () {
      */
     function Process(vertex) {
 
+        this.getOutgoingChannels = function getOutgoingChannels() {
+            var channels = [];
+            vertex.outgoingEdges.forEach(function(edge, ignoredVertex){
+                channels.push(edge.toString());
+            });
+            return channels;
+        };
+
+        this.getIncomingChannels = function getIncomingChannels() {
+            var channels = [];
+            vertex.incomingEdges.forEach(function(edge, ignoredVertex){
+                channels.push(edge.toString());
+            });
+            return channels;
+        };
+
         this.forEachIncomingChannel = function forEachIncomingChannel(foo) {
             vertex.incomingEdges.forEach(function passAlongEdgeString(edge, ignoredVertex) {
                 foo(edge.toString());
@@ -35,6 +51,13 @@ define([], function () {
         this.sendEachOutgoingChannel = function sendEachOutgoingChannel(message) {
             vertex.outgoingEdges.forEach(function (edge, ignoredVertex) {
                 edge.simulateMessageSentFrom(vertex, message);
+            });
+        };
+
+        this.sendEachOutgoingChannelExcept = function sendEachOutgoingChannelException(exceptedChannel, message) {
+            vertex.outgoingEdges.forEach(function (edge, ignoredVertex) {
+                if (edge.toString() != exceptedChannel)
+                    edge.simulateMessageSentFrom(vertex, message);
             });
         };
 

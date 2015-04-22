@@ -48,6 +48,10 @@ onInitiationDo(function (p) {
 
 //noinspection JSUnresolvedFunction
 onReceivingMessageDo(function (p, message, channel) {
+
+    if (message != "<marker>")
+        return;
+
     /*
      * If p receives <marker> through an incoming channel,
      * take snapshot,

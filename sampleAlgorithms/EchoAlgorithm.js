@@ -26,6 +26,9 @@ onInitiationDo(function (p) {
 //noinspection JSUnresolvedFunction
 onReceivingMessageDo(function (p, message, q) {
 
+    if (message != "wave")
+        return;
+
     p.received++;
 
     // If there is no parent yet, propogate the echo outward
