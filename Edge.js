@@ -4,6 +4,8 @@ define([
 
     var DEFAULT_LINE_COLOR = "White";
     var SIM_MESSAGE_LINE_COLOR = "Green";
+    var SIM_MESSAGE_SPARK_COLOR = "Aquamarine";
+    var SIM_MESSAGE_SPARK_RADIUS = 10;
 
     /**
      * @param {Vertex} startVertex
@@ -15,9 +17,9 @@ define([
         this.isUndirected = isDirected !== true;
         this.startVertex = startVertex;
         this.endVertex = endVertex;
-        this._shape = createGfxElementAt(startVertex, endVertex);
+        this._shape = createSvgLine(startVertex, endVertex);
         this._sim_listeners = [];
-        this._sim_svgLines = [];
+        this._sim_svgShapes = [];
         Vertex._stage.addChildAt(this._shape, 0);
 
         startVertex.addOutgoingEdge(endVertex, this);
@@ -109,11 +111,11 @@ define([
         this._sim_listeners.forEach(function(listener){
             createjs.Ticker.off("tick", listener);
         });
-        this._sim_svgLines.forEach(function(svgLine){
+        this._sim_svgShapes.forEach(function(svgLine){
             Vertex._stage.removeChild(svgLine);
         });
         this._sim_listeners = [];
-        this._sim_svgLines = [];
+        this._sim_svgShapes = [];
     };
 
     /**
@@ -127,33 +129,48 @@ define([
         var endCoords = targetVertex.getCoordinatesOfCenter();
         var delta = 0.01; // TODO random between 0 and 1
         var currentBias = 0.0;
-        var svgLine = createGfxElementAt(sourceVertex, sourceVertex, SIM_MESSAGE_LINE_COLOR);
-        Vertex._stage.addChild(svgLine);
+        var svgContainer = new createjs.Container();
+        var svgLine = createSvgLine(sourceVertex, sourceVertex, SIM_MESSAGE_LINE_COLOR);
+        var svgSpark = createSvgSpark(0, 0);
+        svgContainer.addChild(svgLine);
+        svgContainer.addChild(svgSpark);
+        Vertex._stage.addChild(svgContainer);
         var listener = createjs.Ticker.on("tick", function updateSvgLineOnTick(event) {
             if (!event.paused) {
                 currentBias = Math.min(1.0, currentBias + delta);
                 var currentCoords = interpolateCoordinatesFrom(currentBias, startCoords, endCoords);
                 svgLine.graphics.instructions[1].x = currentCoords.x;
                 svgLine.graphics.instructions[1].y = currentCoords.y;
+                svgSpark.graphics.instructions[1].x = svgSpark.graphics.instructions[2].x = currentCoords.x;
+                svgSpark.graphics.instructions[1].y = svgSpark.graphics.instructions[2].y = currentCoords.y;
                 Vertex._stage.update();
                 if (currentBias == 1.0) {
                     createjs.Ticker.off("tick", listener);
                     targetVertex.sim_receiveMessageFrom(sourceVertex, message);
+                    svgContainer.removeChild(svgSpark);
                 }
             }
         });
         this._sim_listeners.push(listener);
-        this._sim_svgLines.push(svgLine);
+        this._sim_svgShapes.push(svgContainer);
     };
 
     /* ******************************* Helpers ********************************/
+    function createSvgSpark(xCoord, yCoord) {
+        var circle = new createjs.Shape();
+        circle.graphics.beginStroke(SIM_MESSAGE_SPARK_COLOR)
+            .drawCircle(xCoord, yCoord, SIM_MESSAGE_SPARK_RADIUS)
+            .drawCircle(xCoord, yCoord, SIM_MESSAGE_SPARK_RADIUS / 2);
+        return circle;
+    }
+
     /**
      * @param {Vertex} startVertex
      * @param {Vertex} endVertex
      * @param {string} [color] - Any CSS-recognized color
      * @returns {*} - the EaselJS GUI object for this Edge's line
      */
-    function createGfxElementAt(startVertex, endVertex, color){
+    function createSvgLine(startVertex, endVertex, color){
         var startCoords = startVertex.getCoordinatesOfCenter();
         var endCoords = endVertex.getCoordinatesOfCenter();
         var gfx = new createjs.Graphics();
