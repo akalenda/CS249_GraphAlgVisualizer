@@ -281,7 +281,7 @@ define([
     Vertex.prototype.simulateNonblockingProcess = function simulateNonblockingProcess() {
         var that = this;
         var percentDone = 0;
-        var delta = .03;
+        var delta = Math.random() * (0.1 - 0.01) + 0.01;
         this._sim_listener = function updateSvgFillOnTick(event) {
             if (!event.paused) {
                 percentDone = Math.min(1, percentDone + delta);

@@ -9,6 +9,14 @@ define([], function () {
 
         var __ce__that = this;
 
+        function randomizeTraversalTimes() {
+            __ce__that.traversalTimesAreRandom = true;
+        }
+
+        function randomizeProcessTimes() {
+            __ce__that.processTimesAreRandom = true;
+        }
+
         /**
          * What to do with each Process when it first loads, e.g. setting initial values and so on
          * @param foo

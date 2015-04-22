@@ -1,3 +1,6 @@
+randomizeTraversalTimes();
+randomizeProcessTimes();
+
 /**
  * @fileoverview The Chandy-Lamport snapshot algorithm, one of the most basic distributed algorithms
  * as described in Wan Fokkink's "Distributed Algorithms: An Intuitive Approach"

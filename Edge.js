@@ -127,7 +127,7 @@ define([
         var targetVertex = (sourceVertex == this.startVertex) ? this.endVertex : this.startVertex;
         var startCoords = sourceVertex.getCoordinatesOfCenter();
         var endCoords = targetVertex.getCoordinatesOfCenter();
-        var delta = 0.01; // TODO random between 0 and 1
+        var delta = Math.random() * (0.1 - 0.01) + 0.01;
         var currentBias = 0.0;
         var svgContainer = new createjs.Container();
         var svgLine = createSvgLine(sourceVertex, sourceVertex, SIM_MESSAGE_LINE_COLOR);
