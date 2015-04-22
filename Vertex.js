@@ -3,6 +3,8 @@ define([
     "Process"
 ], function ($, Process) {
 
+    var PROCESS_GRADIENT_COLORS = ['#8fdb85', '#8fdb85', '#bfffb7', '#c3baff', '#948ae2', '#948ae2'];
+
     /**
      * The radius of vertices as they appear on the canvas
      * @type {number}
@@ -42,7 +44,8 @@ define([
         this._svgContainer.on('pressup'  , passEventToListeners);
 
         /**
-         * We place this reference here so that when EaselJS produces the container as a search result, we can trace it back to this Vertex.
+         * We place this reference here so that when EaselJS produces the container as a search result,
+         * we can trace it back to this Vertex.
          * @type {Vertex}
          */
         this._svgContainer.owningVertex = this;
@@ -109,7 +112,8 @@ define([
     };
 
     /**
-     * Removes the vertex from the program. This includes both its graphical and algorithmic components, as well as any edges connected to it.
+     * Removes the vertex from the program. This includes both its graphical and algorithmic components,
+     * as well as any edges connected to it.
      */
     Vertex.prototype.remove = function remove(){
         if(!this.outgoingEdges)
@@ -117,10 +121,8 @@ define([
         var edgeMap = this.outgoingEdges;
         var that = this;
         this.outgoingEdges = null;
-        edgeMap.forEach(function completelyRemove(ignored, edge){
-            var otherVertex = (edge.startVertex == that) ? edge.endVertex : edge.startVertex;
+        edgeMap.forEach(function completelyRemove(edge, ignoredVertex){
             edge.remove();
-            otherVertex.removeOutgoingEdgeTo(that);
         });
         Vertex._stage.removeChild(this._svgContainer);
         Vertex.list = Vertex.list.filter(function(a){return a !== that;});
@@ -130,7 +132,8 @@ define([
     };
 
     /**
-     * Shifts where on the EaselJS stage the SVG graphics for this vertex appear. It also updates all of the outgoing edges to track the movement.
+     * Shifts where on the EaselJS stage the SVG graphics for this vertex appear. It also updates all of the
+     * outgoing edges to track the movement.
      * TODO: The Vertex can also be the target of incoming directed edges, which will currently not be updated. This will need to be handled specially.
      * @param {number} xCoord
      * @param {number} yCoord
@@ -138,7 +141,7 @@ define([
     Vertex.prototype.moveTo = function moveTo(xCoord, yCoord){
         this._svgContainer.x = xCoord;
         this._svgContainer.y = yCoord;
-        this.outgoingEdges.forEach(function(ignored, edge){
+        this.outgoingEdges.forEach(function(edge, ignoredVertex){
             edge.updateGfxElements();
         });
     };
@@ -249,7 +252,57 @@ define([
         Vertex._codeEnclosure.msgReceiver(this._process, message, sourceVertex.toString());
     };
 
+    Vertex.prototype.sim_terminate = function sim_terminate() {
+        debugger;
+    };
+
+    Vertex.prototype.simulateBlockingProcess = function simulateBlockingProcess() {
+        // TODO
+    };
+
+    Vertex.prototype.simulateNonblockingProcess = function simulateNonblockingProcess() {
+        var that = this;
+        var percentDone = 0;
+        var delta = .03;
+        function updateSvgFillOnTick(event) {
+            if (!event.paused) {
+                percentDone = Math.min(1, percentDone + delta);
+                var circle = that._svgContainer.getChildByName("circle");
+                updateShapeGradient(circle, percentDone);
+                updateStage();
+                if (percentDone == 1)
+                    createjs.Ticker.removeEventListener('tick', updateSvgFillOnTick);
+            }
+        }
+        createjs.Ticker.addEventListener('tick', updateSvgFillOnTick);
+    };
+
     /* ********************************* Private Helpers *****************************************/
+    /**
+     * Causes the EaselJS stage to update, redrawing everything as needed. Try to avoid using it. It's often already
+     * being done further up the call stack anyway, which is better as that is more likely to capture multiple stage
+     * updates (this is a relatively expensive operation) and better fits the natural hierarchy of the program.
+     * TODO: It would be better if the functions that use Ticker would prompt EaselController to have its own Ticker
+     * that updates the Stage once per tick, rather than each animation prompting a stage update each tick. That being
+     * said, I don't expect this to have much if any performance impact.
+     */
+    function updateStage() {
+        Vertex._stage.update();
+    }
+
+    function updateShapeGradient(shape, percentComplete) {
+        var ratios = [
+            0,
+            Math.max(0.0, percentComplete / 2),
+            Math.max(0.0, percentComplete - 0.001),
+            Math.min(1.0, percentComplete + 0.001),
+            Math.min(1.0, (percentComplete + 1.0) / 2),
+            1
+        ];
+        shape.graphics.beginLinearGradientFill(PROCESS_GRADIENT_COLORS, ratios, 0, CIRCLE_RADIUS, 0, -CIRCLE_RADIUS);
+        shape.graphics.drawCircle(0, 0, CIRCLE_RADIUS); // TODO this line shouldnt be necessary, file a GitHub issue
+    }
+    
     /**
      * // TODO use cached shape
      * @param {Vertex} that
@@ -257,7 +310,9 @@ define([
      */
     function createGfx_circle(that){
         var circle = new createjs.Shape();
-        circle.graphics.beginFill("DeepSkyBlue").drawCircle(0, 0, CIRCLE_RADIUS);
+        updateShapeGradient(circle, 0);
+        circle.graphics.drawCircle(0, 0, CIRCLE_RADIUS);
+        circle.name = "circle";
         circle.owningVertex = that;
         return circle;
     }
@@ -286,7 +341,9 @@ define([
         var numPoints = 5;
         var pointLength = CIRCLE_RADIUS / 8;
         var rotationAngle = 0;
-        star.graphics.beginFill("Aquamarine").drawPolyStar(xCoord, yCoord, coreRadius, numPoints, pointLength, rotationAngle);
+        star.graphics
+            .beginFill("Aquamarine")
+            .drawPolyStar(xCoord, yCoord, coreRadius, numPoints, pointLength, rotationAngle);
         star.owningVertex = that;
         return star;
     }
@@ -295,7 +352,8 @@ define([
      * @param {Vertex} that
      * @param {number} xCoord
      * @param {number} yCoord
-     * @returns {*} - A single EaselJS object containing all of the SVG graphical elements of a Vertex, hooking into the eventListener back in the constructor... apologies for it being so roundabout :/
+     * @returns {*} - A single EaselJS object containing all of the SVG graphical elements of a Vertex, hooking into the
+     * eventListener back in the constructor... apologies for it being so roundabout :/
      */
     function createGfx_container(that, xCoord, yCoord){
         var circle = createGfx_circle(that);
