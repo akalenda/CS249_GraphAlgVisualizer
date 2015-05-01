@@ -14,7 +14,8 @@ onInitializationDo(
      * @param {Process} p
      */
     function (p) {
-        // Your code
+        p.dist = "infinity";
+        p.parent = "";
     }
 );
 
@@ -25,7 +26,8 @@ onInitiationDo(
      * @param {Process} p
      */
     function (p) {
-        // Your code
+        p.dist = 0;
+        p.sendEachOutgoingChannel({dist: 0});
     }
 );
 
@@ -38,6 +40,14 @@ onReceivingMessageDo(
      * @param {String} q
      */
     function (p, message, q) {
-        // Your code
+        if (message.dist) {
+            var d = message.dist;
+            var d2 = d + p.getDistanceTo(q);
+            if (p.dist === "infinity" || d2 < p.dist) {
+                p.dist = d2;
+                p.parent = q;
+                p.sendEachOutgoingChannelExcept(q, {dist: d2});
+            }
+        }
     }
 );

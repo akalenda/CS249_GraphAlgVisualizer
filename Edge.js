@@ -121,7 +121,7 @@ define([
     /**
      *
      * @param {Vertex} sourceVertex
-     * @param {string} message
+     * @param {*} message
      */
     Edge.prototype.simulateMessageSentFrom = function simulateMessageSentFrom(sourceVertex, message) {
         var that = this;
