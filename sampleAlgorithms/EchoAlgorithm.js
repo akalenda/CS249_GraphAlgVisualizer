@@ -26,7 +26,7 @@ onInitiationDo(function (p) {
 //noinspection JSUnresolvedFunction
 onReceivingMessageDo(function (p, message, q) {
 
-    if (message != "wave")
+    if (message != "<wave>")
         return;
 
     p.received++;
