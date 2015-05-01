@@ -64,7 +64,7 @@ function sendWave(p) {
         p.parent = channelsPending[0];
         p.send(channelsPending[0], "<wave>");
     } else if (channelsPending.length == 0) {
-        p.terminate();
+        p.decide();
         p.sendEachOutgoingChannelExcept(p.parent, "<info>");
     }
 }

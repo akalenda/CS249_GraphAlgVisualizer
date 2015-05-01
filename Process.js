@@ -70,7 +70,7 @@ define([], function () {
         };
 
         this.decide = function decide() {
-            vertex.sim_decide();
+            vertex.sim_terminate(); // TODO differentiate decide from terminate
         };
 
         this.terminate = function terminate() {
