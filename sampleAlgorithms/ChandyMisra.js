@@ -5,6 +5,8 @@
 //noinspection JSUnresolvedFunction
 randomizeTraversalTimes(); // optional
 //noinspection JSUnresolvedFunction
+addJitterToTraversalTimes();
+//noinspection JSUnresolvedFunction
 randomizeProcessTimes(); // optional
 
 //noinspection JSUnresolvedFunction
@@ -40,7 +42,7 @@ onReceivingMessageDo(
      * @param {String} q
      */
     function (p, message, q) {
-        if (message.dist) {
+        if (message.dist !== undefined) {
             var d = message.dist;
             var d2 = d + p.getDistanceTo(q);
             if (p.dist === "infinity" || d2 < p.dist) {

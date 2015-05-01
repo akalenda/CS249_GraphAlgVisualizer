@@ -5,6 +5,8 @@
 //noinspection JSUnresolvedFunction
 randomizeTraversalTimes(); // optional
 //noinspection JSUnresolvedFunction
+addJitterToTraversalTimes();
+//noinspection JSUnresolvedFunction
 randomizeProcessTimes(); // optional
 
 //noinspection JSUnresolvedFunction

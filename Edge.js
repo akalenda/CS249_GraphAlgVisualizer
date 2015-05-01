@@ -116,6 +116,7 @@ define([
         });
         this._sim_listeners = [];
         this._sim_svgShapes = [];
+        this._sim_length = generateLength();
     };
 
     /**
@@ -124,11 +125,13 @@ define([
      * @param {*} message
      */
     Edge.prototype.simulateMessageSentFrom = function simulateMessageSentFrom(sourceVertex, message) {
+        if (!$.isNumeric(this._sim_length))
+            this._sim_length = generateLength();
         var that = this;
         var targetVertex = (sourceVertex == this.startVertex) ? this.endVertex : this.startVertex;
         var startCoords = sourceVertex.getCoordinatesOfCenter();
         var endCoords = targetVertex.getCoordinatesOfCenter();
-        var delta = (Vertex._codeEnclosure.traversalTimesAreRandom) ? Math.random() * (0.1 - 0.01) + 0.01 : 0.03;
+        var delta = 0.125 / this._sim_length * generateJitter();
         var currentBias = 0.0;
         var svgContainer = new createjs.Container();
         var svgLine = createSvgLine(sourceVertex, sourceVertex, SIM_MESSAGE_LINE_COLOR);
@@ -156,7 +159,22 @@ define([
         this._sim_svgShapes.push(svgContainer);
     };
 
+    /**
+     * @returns {number}
+     */
+    Edge.prototype.sim_getLength = function sim_getLength() {
+        return this._sim_length;
+    };
+
     /* ******************************* Helpers ********************************/
+    function generateLength() {
+        return (Vertex._codeEnclosure.traversalTimesAreRandom) ? Math.random() * 6 + 1 : 4;
+    }
+
+    function generateJitter() {
+        return (Math.random() * 2 - 1) * Vertex._codeEnclosure.traversalTimeJitter + 1;
+    }
+
     function createSvgSpark(xCoord, yCoord) {
         var circle = new createjs.Shape();
         circle.graphics.beginStroke(SIM_MESSAGE_SPARK_COLOR)

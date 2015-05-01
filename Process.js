@@ -94,6 +94,10 @@ define([], function () {
             vertex.getOutgoingEdgeByString(otherProcess).simulateMessageSentFrom(vertex, message);
         };
 
+        this.getDistanceTo = function getDistanceTo(otherProcess) {
+            return vertex.getOutgoingEdgeByString(otherProcess).sim_getLength();
+        };
+
         this.toString = function toString() {
             return vertex.toString();
         };

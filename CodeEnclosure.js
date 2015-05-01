@@ -9,13 +9,25 @@ define([], function () {
     function CodeEnclosure(sourceCode) {
 
         var __ce__that = this;
+        __ce__that.traversalTimeJitter = 0.0;
 
         //noinspection JSUnusedLocalSymbols
         /**
-         * If used, then messages will take a random amount of time to get from one Process to another
+         * If used, then each edge will have a randomized length (e.g. time for messages to traverse the channel)
          */
         function randomizeTraversalTimes() {
             __ce__that.traversalTimesAreRandom = true;
+        }
+
+        //noinspection JSUnusedLocalSymbols
+        /**
+         * If used, then the actual time for a message to traverse an edge/channel will be slightly off from its
+         * standard length. The number given should be between 0.0 and 1.0, e.g. if given 0.25, then a message's
+         * traversal time can be anywhere from 75-125% of its standard time.
+         * @param {number} percent
+         */
+        function addJitterToTraversalTimes(percent) {
+            __ce__that.traversalTimesHaveJitter = ($.isNumeric(percent)) ? percent : 0.25;
         }
 
         //noinspection JSUnusedLocalSymbols
