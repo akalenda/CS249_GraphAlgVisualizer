@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <title>blah</title>
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="bootstrap.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.1.0/codemirror.min.css">
+    <link rel="stylesheet" href="codeMirrorTheme.css">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.1.0/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.1.0/mode/javascript/javascript.min.js"></script>
@@ -19,22 +20,22 @@
 <body ng-controller="EaselController as easelCtrl" style="background-color: #333333">
 
     <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.resetStage                ()">Reset</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_placeVertices   ()">Place vertices</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_drawEdges       ()">Draw edges</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_markInitiators  ()">Mark initiators</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
+        <button type="button" class="btn btn-danger"  ng-click="easelCtrl.resetStage                ()">Reset</button>
+        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_placeVertices   ()">Place vertices</button>
+        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_drawEdges       ()">Draw edges</button>
+        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_markInitiators  ()">Mark initiators</button>
+        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
+        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
+        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
     </div>
 
     <div>
-        <canvas id="mainCanvas" width="1000" height="600" style="background-color: #444444"></canvas>
+        <canvas id="mainCanvas" width="1000" height="550" style="background-color: #444444"></canvas>
     </div>
 
     <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.alg_run  ()">Run</button>
-        <button type="button" class="btn btn-default" ng-click="easelCtrl.alg_reset()">Reset</button>
+        <button type="button" class="btn btn-danger" ng-click="easelCtrl.alg_reset()">Reset</button>
+        <button type="button" class="btn btn-info"   ng-click="easelCtrl.alg_run  ()">Run</button>
     </div>
 
 </body>

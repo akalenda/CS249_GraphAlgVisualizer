@@ -23,8 +23,11 @@ define([
         setStageListeners();
         stage.update();
         var codeMirror = CodeMirror(document.body, {
-            value : '// Code goes here\n',
-            mode  : 'javascript'
+            value       : '// Code goes here\n\n',
+            mode        : 'javascript',
+            theme       : "pastel-on-dark",
+            smartIndent : true,
+            lineNumbers : true
         });
 
         /* *********************************** Define modalities **************************************/
@@ -197,6 +200,7 @@ define([
         };
 
         /* ********************************* Helpers ******************************************/
+
         /**
          * This sets up listeners for mouse events that occur on the canvas, but not on an object on that canvas.
          */
