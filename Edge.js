@@ -106,6 +106,18 @@ define([
         }
     };
 
+    /**
+     * @param {Vertex} vertex - A vertex at one end of this edge
+     * @returns {Vertex} - The vertex at the other end of the edge from the vertex provided
+     */
+    Edge.prototype.getVertexOtherThan = function getVertexOtherThan(vertex) {
+        if (this.startVertex == vertex)
+            return this.endVertex;
+        if (this.endVertex == vertex)
+            return this.startVertex;
+        throw new Error("Provided vertex is not part of this edge");
+    };
+
     /* *************************************** Simulation functions ********************************************/
     Edge.prototype.sim_reset = function sim_reset() {
         this._sim_listeners.forEach(function(listener){

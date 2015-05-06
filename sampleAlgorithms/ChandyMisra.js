@@ -17,7 +17,6 @@ onInitializationDo(
      */
     function (p) {
         p.dist = "infinity";
-        p.parent = "";
     }
 );
 
@@ -47,7 +46,7 @@ onReceivingMessageDo(
             var d2 = d + p.getDistanceTo(q);
             if (p.dist === "infinity" || d2 < p.dist) {
                 p.dist = d2;
-                p.parent = q;
+                p.setParentTo(q);
                 p.sendEachOutgoingChannelExcept(q, {dist: d2});
             }
         }

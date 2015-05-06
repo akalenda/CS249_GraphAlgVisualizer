@@ -5,6 +5,8 @@ define([
 
     var PROCESS_GRADIENT_COLORS = ['#8fdb85', '#8fdb85', '#bfffb7', '#c3baff', '#948ae2', '#948ae2'];
     var PROCESS_GRADIENT_COLORS_TERMINATE = ['#ff5c5c', '#febbbb', '#febbbb', '#febbbb', '#febbbb', '#ff5c5c'];
+    var PARENT_ARROW_COLOR = '#ff8800';
+
     /**
      * The radius of vertices as they appear on the canvas
      * @type {number}
@@ -326,30 +328,35 @@ define([
 
     function drawArrowToParent(that) {
         var theseCoords = that.getCoordinatesOfCenter();
-        var thoseCoords = Vertex.list.filter(function(a){return a.toString() == that._sim_parent;})[0].getCoordinatesOfCenter();
+        var thoseCoords = that.getOutgoingEdgeByString(that._sim_parent).getVertexOtherThan(that).getCoordinatesOfCenter();
         var dx = thoseCoords.x - theseCoords.x;
-        var dy = thoseCoords.x - theseCoords.x;
+        var dy = thoseCoords.y - theseCoords.y;
         var distance = Math.sqrt(dx * dx + dy * dy);
-        var theta = Math.atan(dy / dx);
-        var curve = new createjs.Shape().set({x:0, y:0});
-        var targetX = thoseCoords.x - CIRCLE_RADIUS * Math.cos(theta);
-        var targetY = thoseCoords.y - CIRCLE_RADIUS * Math.sin(theta);
-        curve.bezierCurveTo(
-            theseCoords.x + (distance * 0.25) * Math.cos(theta * 1.75),
-            theseCoords.y + (distance * 0.25) * Math.sin(theta * 1.75),
-            theseCoords.x + (distance * 0.5 ) * Math.cos(theta * 1.5),
-            theseCoords.y + (distance * 0.5 ) * Math.sin(theta * 1.5),
-            targetX,
-            targetY
-        );
+        var theta = Math.atan2(dy, dx);
+        var curve = new createjs.Shape();
+        var ctrlPt1x = theseCoords.x + (distance * 0.33) * Math.cos(theta + d2r(20));
+        var ctrlPt1y = theseCoords.y + (distance * 0.33) * Math.sin(theta + d2r(20));
+        var ctrlPt2x = thoseCoords.x + (distance * 0.33) * Math.cos(theta + d2r(160));
+        var ctrlPt2y = thoseCoords.y + (distance * 0.33) * Math.sin(theta + d2r(160));
+        curve.graphics
+            .setStrokeStyle(2)
+            .beginStroke(PARENT_ARROW_COLOR)
+            .moveTo(theseCoords.x, theseCoords.y)
+            .bezierCurveTo(ctrlPt1x, ctrlPt1y, ctrlPt2x, ctrlPt2y, thoseCoords.x, thoseCoords.y);
         var angle = 0;
         var triangle = new createjs.Shape();
-        triangle.graphics.drawPolyStar(targetX, targetY, CIRCLE_RADIUS * 0.5, 0, angle);
+        triangle.graphics
+            .beginFill(PARENT_ARROW_COLOR)
+            .drawPolyStar(thoseCoords.x, thoseCoords.y, CIRCLE_RADIUS * 0.5, 3, 1, angle);
         if (that._sim_svgArrow)
             Vertex._stage.removeChild(that._sim_svgArrow);
         that._sim_svgArrow = new createjs.Container();
         that._sim_svgArrow.addChild(curve, triangle);
-        Vertex._stage.addChildAt(that._sim_svgArrow, 0);
+        Vertex._stage.addChild(that._sim_svgArrow);
+    }
+
+    function d2r(d){
+        return d * 3.14159265359 / 180;
     }
 
     /**
