@@ -144,6 +144,8 @@ define([
         this.outgoingEdges.forEach(function(edge, ignoredVertex){
             edge.updateGfxElements();
         });
+        if (this._sim_svgArrow)
+            drawArrowToParent(this);
     };
 
     /**
@@ -309,7 +311,46 @@ define([
         createjs.Ticker.addEventListener('tick', this._sim_listener);
     };
 
+    Vertex.prototype.sim_setParentTo = function sim_setAndDrawParentTo(otherVertexString) {
+        if (otherVertexString === this.toString())
+            return;
+        this._sim_parent = otherVertexString;
+        drawArrowToParent(this);
+    };
+
+    Vertex.prototype.sim_getParent = function sim_getParent() {
+        return this._sim_parent;
+    };
+
     /* ********************************* Private Helpers *****************************************/
+
+    function drawArrowToParent(that) {
+        var theseCoords = that.getCoordinatesOfCenter();
+        var thoseCoords = Vertex.list.filter(function(a){return a.toString() == that._sim_parent;})[0].getCoordinatesOfCenter();
+        var dx = thoseCoords.x - theseCoords.x;
+        var dy = thoseCoords.x - theseCoords.x;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var theta = Math.atan(dy / dx);
+        var curve = new createjs.Shape().set({x:0, y:0});
+        var targetX = thoseCoords.x - CIRCLE_RADIUS * Math.cos(theta);
+        var targetY = thoseCoords.y - CIRCLE_RADIUS * Math.sin(theta);
+        curve.bezierCurveTo(
+            theseCoords.x + (distance * 0.25) * Math.cos(theta * 1.75),
+            theseCoords.y + (distance * 0.25) * Math.sin(theta * 1.75),
+            theseCoords.x + (distance * 0.5 ) * Math.cos(theta * 1.5),
+            theseCoords.y + (distance * 0.5 ) * Math.sin(theta * 1.5),
+            targetX,
+            targetY
+        );
+        var angle = 0;
+        var triangle = new createjs.Shape();
+        triangle.graphics.drawPolyStar(targetX, targetY, CIRCLE_RADIUS * 0.5, 0, angle);
+        if (that._sim_svgArrow)
+            Vertex._stage.removeChild(that._sim_svgArrow);
+        that._sim_svgArrow = new createjs.Container();
+        that._sim_svgArrow.addChild(curve, triangle);
+        Vertex._stage.addChildAt(that._sim_svgArrow, 0);
+    }
 
     /**
      * Causes the EaselJS stage to update, redrawing everything as needed. Try to avoid using it. It's often already

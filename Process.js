@@ -98,6 +98,14 @@ define([], function () {
             return vertex.getOutgoingEdgeByString(otherProcess).sim_getLength();
         };
 
+        this.setParentTo = function setParentTo(otherProcess) {
+            vertex.sim_setParentTo(otherProcess);
+        };
+
+        this.getParent = function getParent() {
+            return vertex.sim_getParent();
+        }
+
         this.toString = function toString() {
             return vertex.toString();
         };
