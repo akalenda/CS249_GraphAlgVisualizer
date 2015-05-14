@@ -261,6 +261,10 @@ define([
             this._process = null;
         if (this._sim_listener)
             createjs.Ticker.removeEventListener('tick', this._sim_listener);
+        if (this._sim_svgArrow) {
+            this._svgContainer.removeChild(this._sim_svgArrow);
+            this._sim_svgArrow = null;
+        }
         updateShapeGradient(this._svgContainer.getChildByName("circle"), 0);
         this.outgoingEdges.forEach(function (edge, ignoredVertex) {
             edge.sim_reset();
@@ -314,10 +318,9 @@ define([
     };
 
     Vertex.prototype.sim_setParentTo = function sim_setAndDrawParentTo(otherVertexString) {
-        if (otherVertexString === this.toString())
-            return;
         this._sim_parent = otherVertexString;
-        drawArrowToParent(this);
+        if (this._sim_parent !== this.toString())
+            drawArrowToParent(this);
     };
 
     Vertex.prototype.sim_getParent = function sim_getParent() {
@@ -331,32 +334,24 @@ define([
         var thoseCoords = that.getOutgoingEdgeByString(that._sim_parent).getVertexOtherThan(that).getCoordinatesOfCenter();
         var dx = thoseCoords.x - theseCoords.x;
         var dy = thoseCoords.y - theseCoords.y;
-        var distance = Math.sqrt(dx * dx + dy * dy);
         var theta = Math.atan2(dy, dx);
-        var curve = new createjs.Shape();
-        var ctrlPt1x = theseCoords.x + (distance * 0.33) * Math.cos(theta + d2r(20));
-        var ctrlPt1y = theseCoords.y + (distance * 0.33) * Math.sin(theta + d2r(20));
-        var ctrlPt2x = thoseCoords.x + (distance * 0.33) * Math.cos(theta + d2r(160));
-        var ctrlPt2y = thoseCoords.y + (distance * 0.33) * Math.sin(theta + d2r(160));
-        curve.graphics
-            .setStrokeStyle(2)
-            .beginStroke(PARENT_ARROW_COLOR)
-            .moveTo(theseCoords.x, theseCoords.y)
-            .bezierCurveTo(ctrlPt1x, ctrlPt1y, ctrlPt2x, ctrlPt2y, thoseCoords.x, thoseCoords.y);
-        var angle = 0;
-        var triangle = new createjs.Shape();
-        triangle.graphics
-            .beginFill(PARENT_ARROW_COLOR)
-            .drawPolyStar(thoseCoords.x, thoseCoords.y, CIRCLE_RADIUS * 0.5, 3, 1, angle);
+        var theta2 = theta + d2r(160);
+        dx += CIRCLE_RADIUS * 1.5 * Math.cos(theta2);
+        dy += CIRCLE_RADIUS * 1.5 * Math.sin(theta2);
         if (that._sim_svgArrow)
-            Vertex._stage.removeChild(that._sim_svgArrow);
+            that._svgContainer.removeChild(that._sim_svgArrow);
         that._sim_svgArrow = new createjs.Container();
-        that._sim_svgArrow.addChild(curve, triangle);
-        Vertex._stage.addChild(that._sim_svgArrow);
+        that._sim_svgArrow.addChild(createGfx_curve(dx, dy, theta));
+        that._sim_svgArrow.addChild(createGfx_triangle(dx, dy, theta));
+        that._svgContainer.addChildAt(that._sim_svgArrow, 0);
     }
 
     function d2r(d){
         return d * 3.14159265359 / 180;
+    }
+
+    function r2d(r) {
+        return r * 180 / 3.14159265359;
     }
 
     /**
@@ -409,6 +404,44 @@ define([
         that._text.textAlign = "center";
         that._text.y = -(CIRCLE_RADIUS / 2);
         return that._text;
+    }
+
+    /**
+     * @param {number} dx
+     * @param {number} dy
+     * @param {number} theta
+     * @returns {*} - An EaselJS object for the SVG curve
+     */
+    function createGfx_curve(dx, dy, theta) {
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var curve = new createjs.Shape();
+        var ctrlPt1x = (distance * 0.33) * Math.cos(theta + d2r(20));
+        var ctrlPt1y = (distance * 0.33) * Math.sin(theta + d2r(20));
+        var ctrlPt2x = (distance * 0.33) * Math.cos(theta + d2r(160)) + dx;
+        var ctrlPt2y = (distance * 0.33) * Math.sin(theta + d2r(160)) + dy;
+        curve.graphics
+            .setStrokeStyle(2)
+            .beginStroke(PARENT_ARROW_COLOR)
+            .moveTo(0, 0)
+            .bezierCurveTo(ctrlPt1x, ctrlPt1y, ctrlPt2x, ctrlPt2y, dx, dy);
+        return curve;
+    }
+
+    /**
+     * @param {number} xCoord
+     * @param {number} yCoord
+     * @param {number} theta
+     * @returns {*} - An EaselJS object for the SVG triangle
+     */
+    function createGfx_triangle(xCoord, yCoord, theta) {
+        var star = new createjs.Shape();
+        var coreRadius = CIRCLE_RADIUS / 2;
+        var numPoints = 3;
+        var pointLength = 0;
+        star.graphics
+            .beginFill(PARENT_ARROW_COLOR)
+            .drawPolyStar(xCoord, yCoord, coreRadius, numPoints, pointLength, r2d(theta) - 30);
+        return star;
     }
 
     /**

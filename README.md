@@ -38,7 +38,7 @@ I don't know, but I know what I'd like to do:
 - A load button that lets users load code from a text file on their computer or the Internet
 - A dropdown menu for quickly loading sample algorithms
 - Sample algorithms from every chapter in the book
-- Pausing the simulation
+- Pause, speed up, slow down the simulation
 - Hovering the mouse over a process, channel, or message displays a tooltip containing information about it
 - Fix all the TODOs littering the code
 - Figure out proper Javascript packaging

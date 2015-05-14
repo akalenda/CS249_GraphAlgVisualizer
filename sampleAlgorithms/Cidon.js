@@ -1,5 +1,5 @@
 /*
- * @fileoverview Cidon's despth-first search algorithm
+ * @fileoverview Cidon's depth-first search algorithm
  */
 
 //noinspection JSUnresolvedFunction
@@ -68,7 +68,7 @@ onReceivingMessageDo(
                 forwardToken(p);
         } else if (message == "<token>") {
             if (!p.forward) {
-                p.parent = q;
+                p.setParentTo(q);
                 p.token[q] = true;
                 forwardToken(p);
             } else if (p.forward == q) {
@@ -89,12 +89,12 @@ function forwardToken(p) {
         p.token[q] = true;
         if (p.info == false) {
             neighborsThatHaveNotReceivedToken
-                .filter(function(r){ return r != p.parent && r != q; })
+                .filter(function(r){ return r != p.getParent() && r != q; })
                 .forEach(function(r){ p.send(r, "<info>"); });
             p.info = true;
         }
-    } else if (p.parent) {
-        p.send(p.parent, "<token>");
+    } else if (p.hasParent()) {
+        p.sendParent("<token>");
     } else {
         p.decide();
     }

@@ -13,13 +13,12 @@ randomizeProcessTimes();
 onInitializationDo(function (p) {
 
     p.received = 0;
-    p.parent = null;
 });
 
 //noinspection JSUnresolvedFunction
 onInitiationDo(function (p) {
 
-    p.parent = p;
+    p.setParentTo(p);
     p.sendEachOutgoingChannel("<wave>");
 });
 
@@ -32,8 +31,8 @@ onReceivingMessageDo(function (p, message, q) {
     p.received++;
 
     // If there is no parent yet, propogate the echo outward
-    if (!p.parent) {
-        p.parent = q;
+    if (p.hasNoParent()) {
+        p.setParentTo(q);
         p.forEachOutgoingChannel(function (r) {
             if (q != r)
                 p.send(r, "<wave>");
@@ -42,9 +41,9 @@ onReceivingMessageDo(function (p, message, q) {
 
     // Once all echoes are collected, an echo is sent back to the parent
     if (p.received == p.getNumOutgoingChannels()) {
-        if (p.parent == p)
+        if (p.getParent() == p)
             p.terminate();
         else
-            p.send(p.parent, "<wave>");
+            p.sendParent("<wave>");
     }
 });

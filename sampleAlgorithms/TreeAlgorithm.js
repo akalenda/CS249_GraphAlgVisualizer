@@ -14,7 +14,6 @@ onInitializationDo(
      * @param {Process} p
      */
     function (p) {
-        p.parent = null;
         p.received = {};
         p.forEachOutgoingChannel(function(r){
             p.received[r] = false;
@@ -47,7 +46,7 @@ onReceivingMessageDo(
             p.received[q] = true;
             sendWave(p);
         } else if (message == "<info>") {
-            p.sendEachOutgoingChannelExcept(p.parent, "<info>");
+            p.sendEachOutgoingChannelExceptParent("<info>");
         }
     }
 );
@@ -61,10 +60,10 @@ function sendWave(p) {
         return p.received[r] == false;
     });
     if (channelsPending.length == 1) {
-        p.parent = channelsPending[0];
+        p.setParentTo(channelsPending[0]);
         p.send(channelsPending[0], "<wave>");
     } else if (channelsPending.length == 0) {
         p.decide();
-        p.sendEachOutgoingChannelExcept(p.parent, "<info>");
+        p.sendEachOutgoingChannelExceptParent("<info>");
     }
 }

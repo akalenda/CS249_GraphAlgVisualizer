@@ -61,6 +61,10 @@ define([], function () {
             });
         };
 
+        this.sendEachOutgoingChannelExceptParent = function sendEachOutgoingChannelException(exceptedChannel, message) {
+            this.sendEachOutgoingChannelExcept(this.getParent(), message);
+        };
+
         this.getNumOutgoingChannels = function getNumOutgoingChannels() {
             return vertex.outgoingEdges.size;
         };
@@ -99,12 +103,25 @@ define([], function () {
         };
 
         this.setParentTo = function setParentTo(otherProcess) {
+            otherProcess = otherProcess.toString(); // TODO check for instance of Process, throw error if neither string nor Process
             vertex.sim_setParentTo(otherProcess);
         };
 
         this.getParent = function getParent() {
             return vertex.sim_getParent();
-        }
+        };
+
+        this.sendParent = function sendParent(message) {
+            this.send(this.getParent(), message);
+        };
+
+        this.hasParent = function hasParent() {
+            return !!this.getParent();
+        };
+
+        this.hasNoParent = function hasNoParent() {
+            return !this.hasParent();
+        };
 
         this.toString = function toString() {
             return vertex.toString();
