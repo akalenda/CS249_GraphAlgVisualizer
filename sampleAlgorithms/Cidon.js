@@ -31,12 +31,6 @@ onInitializationDo(
          * Stringification of a Process
          * @type {String}
          */
-        p.parent = null;
-
-        /**
-         * Stringification of a Process
-         * @type {String}
-         */
         p.forward = null;
     }
 );

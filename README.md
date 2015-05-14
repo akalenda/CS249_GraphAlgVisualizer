@@ -34,7 +34,6 @@ In Javascript. Take a look at `sampleAlgorithms/_Template.js`; that has the gene
 
 I don't know, but I know what I'd like to do:
 
-- A function in Process that algorithms can use to set a `parent`, which will cause an arrow to the parent to be drawn
 - A load button that lets users load code from a text file on their computer or the Internet
 - A dropdown menu for quickly loading sample algorithms
 - Sample algorithms from every chapter in the book

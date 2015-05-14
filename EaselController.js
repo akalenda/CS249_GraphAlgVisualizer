@@ -182,6 +182,9 @@ define([
         }
 
         /* *************************** Code mirror stuff *****************************************/
+        /**
+         * Resets the graph vertices and edges so that it is as though the algorithm had never been run
+         */
         this.alg_reset = function alg_reset(){
             Vertex.list.forEach(function(vertex){
                 vertex.sim_reset();
@@ -189,6 +192,9 @@ define([
             stage.update();
         };
 
+        /**
+         * Begins a simulation using whatever code has been given
+         */
         this.alg_run = function alg_run(){
             Vertex.useCodeEnclosure(new CodeEnclosure(codeMirror.getValue()));
             Vertex.list.forEach(function(vertex){

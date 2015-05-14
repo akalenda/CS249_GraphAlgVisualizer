@@ -63,6 +63,26 @@ define([
         }
     }
 
+    /**
+     * Removes the vertex from the program. This includes both its graphical and algorithmic components,
+     * as well as any edges connected to it.
+     */
+    Vertex.prototype.remove = function remove(){
+        if(!this.outgoingEdges)
+            return;
+        var edgeMap = this.outgoingEdges;
+        var that = this;
+        this.outgoingEdges = null;
+        edgeMap.forEach(function completelyRemove(edge, ignoredVertex){
+            edge.remove();
+        });
+        Vertex._stage.removeChild(this._svgContainer);
+        resetVertexList(Vertex.list.filter(function(a){return a !== that;}));
+        Vertex.list.forEach(function(vertex){
+            vertex._text.text = vertex.toString();
+        });
+    };
+
     /* ************************ GUI stuff *****************************************************/
 
     /**
@@ -111,26 +131,6 @@ define([
      */
     Vertex.prototype.isInitiator = function isInitiator(){
         return !!this._svgStar;
-    };
-
-    /**
-     * Removes the vertex from the program. This includes both its graphical and algorithmic components,
-     * as well as any edges connected to it.
-     */
-    Vertex.prototype.remove = function remove(){
-        if(!this.outgoingEdges)
-            return;
-        var edgeMap = this.outgoingEdges;
-        var that = this;
-        this.outgoingEdges = null;
-        edgeMap.forEach(function completelyRemove(edge, ignoredVertex){
-            edge.remove();
-        });
-        Vertex._stage.removeChild(this._svgContainer);
-        resetVertexList(Vertex.list.filter(function(a){return a !== that;}));
-        Vertex.list.forEach(function(vertex){
-            vertex._text.text = vertex.toString();
-        });
     };
 
     /**
@@ -206,6 +206,10 @@ define([
         this.outgoingEdges.set(destinationVertex, newEdge);
     };
 
+    /**
+     * @param {Vertex} sourceVertex
+     * @param {Edge} newEdge
+     */
     Vertex.prototype.addIncomingEdge = function addIncomingEdge(sourceVertex, newEdge) {
         this.incomingEdges.set(sourceVertex, newEdge);
     };
@@ -219,6 +223,10 @@ define([
             return this.outgoingEdges.get(otherVertex);
     };
 
+    /**
+     * @param {string} edgeString
+     * @returns {Edge}
+     */
     Vertex.prototype.getOutgoingEdgeByString = function getOutgoingEdgeByString(edgeString) {
         var iter = this.outgoingEdges.values();
         var next = iter.next();
@@ -231,6 +239,10 @@ define([
         throw new Error("No edge '" + edgeString + "' outgoing from " + this.toString());
     };
 
+    /**
+     * @param {Vertex} otherVertex
+     * @returns {Edge}
+     */
     Vertex.prototype.getIncomingEdgeFrom = function getIncomingEdgeFrom(otherVertex) {
         if (this.incomingEdges)
             return this.incomingEdges.get(otherVertex);
@@ -247,6 +259,9 @@ define([
         edgeToRemove.remove();
     };
 
+    /**
+     * @param {Vertex} otherVertex
+     */
     Vertex.prototype.removeIncomingEdgeFrom = function removeIncomingEdgeFrom(otherVertex) {
         var edgeToRemove = this.getIncomingEdgeFrom(otherVertex);
         if (!edgeToRemove)
@@ -256,6 +271,9 @@ define([
     };
 
     /* ********************************** Simulation ********************************************/
+    /**
+     * Resets this Vertex's data so that it is as though the simulation had never been run
+     */
     Vertex.prototype.sim_reset = function sim_reset() {
         if (this._process)
             this._process = null;
@@ -274,22 +292,36 @@ define([
         });
     };
 
+    /**
+     * Prepare for the simulation by creating a new Process at this Vertex, initialized as the given algorithm
+     * specifies
+     */
     Vertex.prototype.sim_initialize = function sim_initialize() {
         this._process = new Process(this);
         if (Vertex._codeEnclosure.initializer)
             Vertex._codeEnclosure.initializer(this._process);
     };
 
+    /**
+     * Attempts to initiate the algorithm as the given algorithm specifies. Only works if it was set as an initiator
+     */
     Vertex.prototype.sim_initiate = function sim_initiate() {
         if (Vertex._codeEnclosure.initiator)
             Vertex._codeEnclosure.initiator(this._process);
     };
 
+    /**
+     * @param {Edge} edge
+     * @param {string} message
+     */
     Vertex.prototype.sim_receiveMessageFrom = function sim_receiveMessageFrom(edge, message) {
         if (Vertex._codeEnclosure.msgReceiver)
             Vertex._codeEnclosure.msgReceiver(this._process, message, edge.toString());
     };
 
+    /**
+     * Simulates a terminating process at this vertex
+     */
     Vertex.prototype.sim_terminate = function sim_terminate() {
         if (this._sim_listener)
             createjs.Ticker.removeEventListener('tick', this._sim_listener);
@@ -297,10 +329,18 @@ define([
         Vertex._stage.update();
     };
 
+    /**
+     * Simulates a process at this vertex which will block all other processes until done. E.g., it will not respond
+     * to received messages until it has completed
+     */
     Vertex.prototype.simulateBlockingProcess = function simulateBlockingProcess() {
         // TODO
     };
 
+    /**
+     * Simulates a process at this vertex that runs asynchronously. Just a simple animation that fills up the circle
+     * as the process "executes"
+     */
     Vertex.prototype.simulateNonblockingProcess = function simulateNonblockingProcess() {
         var that = this;
         var percentDone = 0;
@@ -317,18 +357,28 @@ define([
         createjs.Ticker.addEventListener('tick', this._sim_listener);
     };
 
+    /**
+     * @param {string} otherVertexString
+     */
     Vertex.prototype.sim_setParentTo = function sim_setAndDrawParentTo(otherVertexString) {
         this._sim_parent = otherVertexString;
         if (this._sim_parent !== this.toString())
             drawArrowToParent(this);
     };
 
+    /**
+     * @returns {string}
+     */
     Vertex.prototype.sim_getParent = function sim_getParent() {
         return this._sim_parent;
     };
 
     /* ********************************* Private Helpers *****************************************/
 
+    /**
+     * Draws or redraws an arrow from this Vertex's process to its parent process in the simulation.
+     * @param {Vertex} that
+     */
     function drawArrowToParent(that) {
         var theseCoords = that.getCoordinatesOfCenter();
         var thoseCoords = that.getOutgoingEdgeByString(that._sim_parent).getVertexOtherThan(that).getCoordinatesOfCenter();
@@ -346,12 +396,20 @@ define([
         that._svgContainer.addChildAt(that._sim_svgArrow, 0);
     }
 
-    function d2r(d){
-        return d * 3.14159265359 / 180;
+    /**
+     * @param {number} degrees
+     * @returns {number} radians
+     */
+    function d2r(degrees){
+        return degrees * 3.14159265359 / 180;
     }
 
-    function r2d(r) {
-        return r * 180 / 3.14159265359;
+    /**
+     * @param {number} radians
+     * @returns {number} degrees
+     */
+    function r2d(radians) {
+        return radians * 180 / 3.14159265359;
     }
 
     /**
@@ -366,6 +424,11 @@ define([
         Vertex._stage.update();
     }
 
+    /**
+     * Updates the shape's fill to show its progress in a simulated process
+     * @param shape - An EaselJS shape, i.e. a circle
+     * @param {number} percentComplete - Ranging from 0 to 1
+     */
     function updateShapeGradient(shape, percentComplete) {
         var colors = (percentComplete < 0) ? PROCESS_GRADIENT_COLORS_TERMINATE : PROCESS_GRADIENT_COLORS;
         percentComplete = (percentComplete < 0) ? 0.5 : percentComplete;

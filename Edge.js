@@ -119,6 +119,9 @@ define([
     };
 
     /* *************************************** Simulation functions ********************************************/
+    /**
+     * Resets the data for this edge so it is as though the simulation had never been ran
+     */
     Edge.prototype.sim_reset = function sim_reset() {
         this._sim_listeners.forEach(function(listener){
             createjs.Ticker.off("tick", listener);
@@ -132,9 +135,12 @@ define([
     };
 
     /**
-     *
+     * Simulates a message as it traverses this channel, sent from one vertex to another. It does so by animating a
+     * spark, which moves along the line between the two vertices. Once the message reaches its destination, it will
+     * trigger the Vertex to simulate a message received.
      * @param {Vertex} sourceVertex
-     * @param {*} message
+     * @param {*} message - A string, object, or whatever the algorithm needs it to be. We don't care, we just pass it
+     * along.
      */
     Edge.prototype.simulateMessageSentFrom = function simulateMessageSentFrom(sourceVertex, message) {
         if (!$.isNumeric(this._sim_length))
@@ -179,14 +185,29 @@ define([
     };
 
     /* ******************************* Helpers ********************************/
+    /**
+     * Randomly generates a number to represent the "length" of this edge, e.g. the time it takes for a message to
+     * traverse the channel. It will be used for all messages that traverse the channel in this particular simulation
+     * @returns {number}
+     */
     function generateLength() {
         return (Vertex._codeEnclosure.traversalTimesAreRandom) ? Math.random() * 6 + 1 : 4;
     }
 
+    /**
+     * Randomly generates a number that will be used to add inconsistency to the time it takes a message to traverse
+     * this edge's channel. Thus one message might take 1.2 seconds, the next 1.4, the next 1.3, and so on.
+     * @returns {number}
+     */
     function generateJitter() {
         return (Math.random() * 2 - 1) * Vertex._codeEnclosure.traversalTimeJitter + 1;
     }
 
+    /**
+     * @param {number} xCoord
+     * @param {number} yCoord
+     * @returns {*} - An EaselJS shape that will represent a message traversing the channel
+     */
     function createSvgSpark(xCoord, yCoord) {
         var circle = new createjs.Shape();
         circle.graphics.beginStroke(SIM_MESSAGE_SPARK_COLOR)
