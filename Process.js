@@ -123,6 +123,10 @@ define([], function () {
             return !this.hasParent();
         };
 
+        this.getID = function getID() {
+            return vertex.getID();
+        };
+
         this.toString = function toString() {
             return vertex.toString();
         };
