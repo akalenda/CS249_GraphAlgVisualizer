@@ -167,30 +167,6 @@ define([
         return 'p' + this.getID();
     };
 
-    resetVertexList();
-
-    /**
-     * Initializes/resets Vertex.list
-     * @param {Array<Vertex>} [newList]
-     */
-    function resetVertexList(newList){
-        /**
-         * The list of all active Vertex's
-         * @type {Array<Vertex>}
-         */
-        Vertex.list = newList || [];
-
-        /**
-         * Returns the list of Vertices that are marked as graph algorithm initiators
-         * @returns {Array.<Vertex>}
-         */
-        Vertex.list.getInitiators = function getInitiators(){
-            return Vertex.list.filter(function(vertex){
-                return vertex.isInitiator();
-            });
-        };
-    }
-
     /**
      * @returns {number}
      */
@@ -554,6 +530,36 @@ define([
         Vertex._stage.addChild(container);
         return container;
     }
+
+    /**
+     * Prepare some "static class members" (in the Java sense)
+     */
+    (function(){
+        /**
+         * Initializes/resets Vertex.list
+         * @param {Array<Vertex>} [newList]
+         */
+        function resetVertexList(newList){
+            /**
+             * The list of all active Vertex's
+             * @type {Array<Vertex>}
+             */
+            Vertex.list = newList || [];
+
+            /**
+             * Returns the list of Vertices that are marked as graph algorithm initiators
+             * @returns {Array.<Vertex>}
+             */
+            Vertex.list.getInitiators = function getInitiators(){
+                return Vertex.list.filter(function(vertex){
+                    return vertex.isInitiator();
+                });
+            };
+
+            Vertex.list.reset = resetVertexList;
+        }
+        resetVertexList();
+    })();
 
     return Vertex;
 });

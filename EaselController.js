@@ -79,7 +79,7 @@ define([
         this.resetStage = function resetStage() {
             stage.removeAllChildren();
             stage.clear();
-            Vertex.list = [];
+            Vertex.list.reset();
         };
 
         /**
