@@ -1,8 +1,8 @@
 require.config({
     paths: {
-        'domready'  : '//cdnjs.cloudflare.com/ajax/libs/require-domReady/2.0.1/domReady.min',
-        'jquery'    : '//code.jquery.com/jquery-2.1.1.min',
-        'bootstrap' : '//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min'
+        'domready'  : 'libraries/domReady.min',
+        'jquery'    : 'libraries/jquery-2.1.4.min',
+        'bootstrap' : 'libraries/bootstrap.min'
     },
 
     shim: {
