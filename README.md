@@ -1,3 +1,5 @@
+![](https://github.com/akalenda/CS249_GraphAlgVisualizer/blob/master/screenshot.gif)
+
 A project I'm working on for school.
 
 It has a long way to go...
