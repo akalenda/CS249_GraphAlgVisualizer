@@ -19,6 +19,18 @@
 <body ng-controller="EaselController as easelCtrl" style="background-color: #333333">
 
     <div class="btn-group" role="group" aria-label="...">
+        <div class="btn-group">
+            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Action <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+            </ul>
+        </div>
         <button type="button" class="btn btn-danger"  ng-click="easelCtrl.resetStage                ()">Reset</button>
         <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_placeVertices   ()">Place vertices</button>
         <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_drawEdges       ()">Draw edges</button>
@@ -27,6 +39,7 @@
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
     </div>
+
 
     <div>
         <canvas id="mainCanvas" width="1000" height="550" style="background-color: #444444"></canvas>

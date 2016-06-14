@@ -6,7 +6,8 @@ require.config({
     },
 
     shim: {
-        'bootstrap/affix':      { deps: ['jquery'], exports: '$.fn.affix' },
+        'bootstrap': { deps: ['jquery'] }
+        /*'bootstrap/affix':      { deps: ['jquery'], exports: '$.fn.affix' },
         'bootstrap/alert':      { deps: ['jquery'], exports: '$.fn.alert' },
         'bootstrap/button':     { deps: ['jquery'], exports: '$.fn.button' },
         'bootstrap/carousel':   { deps: ['jquery'], exports: '$.fn.carousel' },
@@ -17,7 +18,7 @@ require.config({
         'bootstrap/scrollspy':  { deps: ['jquery'], exports: '$.fn.scrollspy' },
         'bootstrap/tab':        { deps: ['jquery'], exports: '$.fn.tab'        },
         'bootstrap/tooltip':    { deps: ['jquery'], exports: '$.fn.tooltip' },
-        'bootstrap/transition': { deps: ['jquery'], exports: '$.fn.transition' }
+        'bootstrap/transition': { deps: ['jquery'], exports: '$.fn.transition' }*/
     },
 
     deps: ['EaselController']

@@ -1,8 +1,9 @@
 define([
     "Vertex",
     "ProtoEdge",
-    "CodeEnclosure"
-], function (Vertex, ProtoEdge, CodeEnclosure) {
+    "CodeEnclosure",
+    "bootstrap"
+], function (Vertex, ProtoEdge, CodeEnclosure, bootstrap) {
     'use strict';
 
     var module = angular.module('GraphAlgVisualizer', []);
