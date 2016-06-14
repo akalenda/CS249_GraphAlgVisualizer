@@ -55,6 +55,23 @@
     border-color: #583876;
 }
 
+.btn-export {
+    color: #ffffff;
+    background-color: #764b9e;
+    border-color: #583876;
+}
+
+.btn-export:hover,
+.btn-export:focus,
+.btn-export.focus,
+.btn-export:active,
+.btn-export.active,
+.open > .dropdown-toggle.btn-export {
+    color: #ffffff;
+    background-color: #583876;
+    border-color: #583876;
+}
+
 /*!
  * bootswatch v3.3.4+1
  * Homepage: http://bootswatch.com

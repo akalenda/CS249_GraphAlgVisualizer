@@ -187,9 +187,17 @@ define([
             vertex.unmarkAsInitiator();
         }
 
-        function graph_generate(graphType) {
+        this.graph_generate = function graph_generate(graphType){
+            debugger;
+        };
 
-        }
+        this.graph_import = function graph_import(stringification){
+            debugger;
+        };
+
+        this.graph_export = function graph_export(){
+            debugger;
+        };
 
         /* *************************** Code mirror stuff *****************************************/
         this.alg_load = function alg_load(path){
