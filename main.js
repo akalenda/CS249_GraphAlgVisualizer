@@ -1,7 +1,7 @@
 require.config({
     paths: {
         'domready'  : 'libraries/domReady.min',
-        'jquery'    : 'libraries/jquery-3.0.0.min',
+        'jquery'    : 'libraries/jquery-2.1.4.min',
         'bootstrap' : 'libraries/bootstrap.min'
     },
 
