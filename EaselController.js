@@ -2,8 +2,10 @@ define([
     "Vertex",
     "ProtoEdge",
     "CodeEnclosure",
-    "bootstrap"
-], function (Vertex, ProtoEdge, CodeEnclosure, bootstrap) {
+    'jquery',
+    "bootstrap",
+    "Sample"
+], function (Vertex, ProtoEdge, CodeEnclosure, $, bootstrap, Registry) {
     'use strict';
 
     var module = angular.module('GraphAlgVisualizer', []);
@@ -30,6 +32,9 @@ define([
             smartIndent : true,
             lineNumbers : true
         });
+
+        /* ************************* Initialize the controller with sample algorithms ********************/
+        this.samples = Registry.listing;
 
         /* *********************************** Define modalities **************************************/
         var mode_placeVertices = {
@@ -182,7 +187,24 @@ define([
             vertex.unmarkAsInitiator();
         }
 
+        function graph_generate(graphType) {
+
+        }
+
         /* *************************** Code mirror stuff *****************************************/
+        this.alg_load = function alg_load(path){
+            $.ajax({
+                url: "samples/" + path,
+                success: function(response){
+                    codeMirror.setValue(response);
+                },
+                error: function(response){
+                    if (response.responseText)
+                        codeMirror.setValue(response.responseText);
+                }
+            });
+        };
+
         /**
          * Resets the graph vertices and edges so that it is as though the algorithm had never been run
          */

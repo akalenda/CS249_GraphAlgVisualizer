@@ -5,6 +5,7 @@
     <title>blah</title>
 
     <link rel="stylesheet" href="libraries/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="libraries/bootstrap.min.css">
     <link rel="stylesheet" href="bootstrap.css">
     <link rel="stylesheet" href="libraries/codemirror.min.css">
     <link rel="stylesheet" href="codeMirrorTheme.css">
@@ -21,14 +22,16 @@
     <div class="btn-group" role="group" aria-label="...">
         <div class="btn-group">
             <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Action <span class="caret"></span>
+                Load Sample <span class="caret"></span>
             </button>
-            <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
+            <ul class="dropdown-menu sample-dropdown">
+                <li ng-repeat="sample in easelCtrl.samples">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-loadSample-desc"  ng-click="">{{ sample.title }}</button>
+                        <button type="button" class="btn btn-loadSample-code"  ng-click="easelCtrl.alg_load(sample.path)">Code</button>
+                        <button type="button" class="btn btn-loadSample-graph" ng-click="easelCtrl.graph_generate(sample.graphType)">Graph</button>
+                    </div>
+                </li>
             </ul>
         </div>
         <button type="button" class="btn btn-danger"  ng-click="easelCtrl.resetStage                ()">Reset</button>
