@@ -77,7 +77,7 @@ define([
             edge.remove();
         });
         Vertex._stage.removeChild(this._svgContainer);
-        resetVertexList(Vertex.list.filter(function(a){return a !== that;}));
+        Vertex.list.reset(Vertex.list.filter(function(a){return a !== that;}));
         Vertex.list.forEach(function(vertex){
             vertex._text.text = vertex.toString();
         });
