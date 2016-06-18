@@ -273,6 +273,7 @@ define([
      * specifies
      */
     Vertex.prototype.sim_initialize = function sim_initialize() {
+        this._sim_has_terminated = false;
         this._process = new Process(this);
         if (Vertex._codeEnclosure.initializer)
             Vertex._codeEnclosure.initializer(this._process);
@@ -299,6 +300,7 @@ define([
      * Simulates a terminating process at this vertex
      */
     Vertex.prototype.sim_terminate = function sim_terminate() {
+        this._sim_has_terminated = true;
         if (this._sim_listener)
             createjs.Ticker.removeEventListener('tick', this._sim_listener);
         updateShapeGradient(this._svgContainer.getChildByName("circle"), -1);
@@ -322,13 +324,13 @@ define([
         var percentDone = 0;
         var delta = (Vertex._codeEnclosure.processTimesAreRandom) ? Math.random() * (0.1 - 0.01) + 0.01 : 0.03;
         this._sim_listener = function updateSvgFillOnTick(event) {
-            if (!event.paused) {
-                percentDone = Math.min(1, percentDone + delta);
-                updateShapeGradient(that._svgContainer.getChildByName("circle"), percentDone);
-                updateStage();
-                if (percentDone == 1)
-                    createjs.Ticker.removeEventListener('tick', that._sim_listener);
-            }
+            if (event.paused || that._sim_has_terminated)
+                return;
+            percentDone = Math.min(1, percentDone + delta);
+            updateShapeGradient(that._svgContainer.getChildByName("circle"), percentDone);
+            updateStage();
+            if (percentDone == 1)
+                createjs.Ticker.removeEventListener('tick', that._sim_listener);
         };
         createjs.Ticker.addEventListener('tick', this._sim_listener);
     };
