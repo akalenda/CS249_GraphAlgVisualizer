@@ -1,5 +1,19 @@
 /*
- * @fileoverview Your description here
+ * @fileoverview This is the Tree algorithm described in Wan Fokkink's Distributed Algorithms book. It is a completely
+ * decentralized wave algorithm -- e.g. no initiators are required. Instead, at any time a process may choose to execute
+ * the algorithm.
+ *
+ * The purpose of the algorithm is to view the network as a tree, and determine what the root of that tree should be
+ * based on how quickly messages from all of the network processes can reach it. That is to say, if each child process
+ * has a weight equal to the time it took for its own children's messages to arrive, a nominally balanced tree is
+ * produced. It is a peculiarity of this algorithm that it always produces two candidate roots.
+ *
+ * Another consequence of this algorithm's construction is that the graph must be an actual tree, and thus there can be
+ * no cycles within the network graph. Otherwise it would be impossible for the algorithm to terminate. You can see this
+ * yourself -- try running it on a number of graphs that contain cycles.
+ *
+ * Therefore, another slower algorithm -- Tarry's, Awerbuch's, Cidon's, or the Echo algorithm -- must be used for such
+ * a network.
  */
 
 //noinspection JSUnresolvedFunction
@@ -10,7 +24,8 @@ randomizeProcessTimes(); // optional
 //noinspection JSUnresolvedFunction
 onInitializationDo(
     /**
-     * When the simulation initializes, the code provided here will execute on every process `p` in the network
+     * Once a process is ready to participate, it will simply attempt to send out a <wave>.
+     *
      * @param {Process} p
      */
     function (p) {
@@ -25,21 +40,25 @@ onInitializationDo(
 //noinspection JSUnresolvedFunction
 onInitiationDo(
     /**
-     * When an initiator `p` decides to start the algorithm, the code provided here will be executed
      * @param {Process} p
      */
     function (p) {
-        // Do nothing
+        // Do nothing. The Tree algorithm does not use initiators.
     }
 );
 
 //noinspection JSUnresolvedFunction
 onReceivingMessageDo(
     /**
-     * When a process `p` in the network receives a message through a channel `q`, the code provided here will be executed
-     * @param {Process} p
+     * We are interested in two types of messages in this algorithm: <wave> and <info>.
+     *
+     * <wave> is used to set parents and find the twin roots of the tree.
+     *
+     * <info> is used to disseminate information from parents to children after the tree is decided on.
+     *
+     * @param {Process} p -- the process receiving the message
      * @param {string} message
-     * @param {String} q
+     * @param {String} q -- the process that sent the message
      */
     function (p, message, q) {
         if (message == "<wave>") {
@@ -52,6 +71,17 @@ onReceivingMessageDo(
 );
 
 /**
+ * When looking to send out a <wave>, the process looks at how many neighbors it has from which it has not yet received
+ * a <wave>. If there is only one such neighbor, then it will set that process to be its parent in the tree, and send
+ * the <wave> along.
+ *
+ * When that parent receives the <wave>, it will know that the process is a child, and eliminate it as a possible
+ * parent. In this way the effect propagates, as eventually only one neighbor will remain uneliminated, and
+ * must therefore be its own parent.
+ *
+ * Eventually it comes down to two processes whose <wave> messages pass each other by, and the two process become
+ * parents to one another. When this occurs, a <wave> has been received when no channels remain unaccounted for, and
+ * the two processes decide on themselves as twin roots for the tree.
  *
  * @param {Process} p
  */
