@@ -61,7 +61,7 @@ define([], function () {
             });
         };
 
-        this.sendEachOutgoingChannelExceptParent = function sendEachOutgoingChannelException(exceptedChannel, message) {
+        this.sendEachOutgoingChannelExceptParent = function sendEachOutgoingChannelException(message) {
             this.sendEachOutgoingChannelExcept(this.getParent(), message);
         };
 
