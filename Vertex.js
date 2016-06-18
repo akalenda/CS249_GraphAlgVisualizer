@@ -251,8 +251,8 @@ define([
      * Resets this Vertex's data so that it is as though the simulation had never been run
      */
     Vertex.prototype.sim_reset = function sim_reset() {
-        if (this._process)
-            this._process = null;
+        this._process = null;
+        this._sim_parent = null;
         if (this._sim_listener)
             createjs.Ticker.removeEventListener('tick', this._sim_listener);
         if (this._sim_svgArrow) {
