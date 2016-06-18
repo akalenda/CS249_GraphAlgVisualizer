@@ -1,6 +1,13 @@
 /*
- * @fileoverview The Chandy-Lamport snapshot algorithm, one of the most basic distributed algorithms
- * as described in Wan Fokkink's "Distributed Algorithms: An Intuitive Approach"
+ * @fileoverview The Chandy-Lamport snapshot algorithm
+ *
+ * The purpose of Chandy-Lamport is to signal all processes in a network to take a "snapshot", but even that much is not
+ * necessary for the algorithm. Really, Chandy-Lamport can be used to send any kind of signal to all the processes in
+ * a system. In this way, it is the most basic of all (useful) distributed algorithms.
+ *
+ * One of the weaknesses with the algorithm is that the channels (edges) between processes (vertices) must be First In
+ * First Out (FIFO) if it is to support more than one snapshot. (Currently the visualizer has no way of demonstrating
+ * this.)
  */
 
 //noinspection JSUnresolvedFunction
@@ -12,7 +19,7 @@ randomizeProcessTimes();
 onInitializationDo(function (p) {
 
     /**
-     * Is set to true when p takes a local snapshot of its state
+     * Will be set to true when p takes a local snapshot of its state
      * @type {boolean}
      */
     p.recorded = false;
@@ -37,10 +44,6 @@ onInitializationDo(function (p) {
     });
 });
 
-/*
- * If p wants to initiate a network-wide snapshot,
- * then TakeSnapshot process
- */
 //noinspection JSUnresolvedFunction
 onInitiationDo(function (p) {
     takeSnapshot(p);
@@ -82,7 +85,7 @@ onReceivingMessageDo(function (p, message, channel) {
 /*
  * If not yet recorded,
  * then set recorded true,
- * send marker thru each outgoing channel,
+ * send marker through each outgoing channel,
  * and take local snapshot
  */
 function takeSnapshot(p) {
