@@ -3,8 +3,9 @@
  * It is a very significant algorithm which forms the basis of many others. It forms a spanning tree of an undirected
  * network, rooted in the initiator.
  *
- * The great advantage of the Echo algorithm, as opposed to similar algorithms (Tarry's, Cidon's) is how easy it is
- * to intuit the algorithm's behavior, and how readily the name "Echo" conveys that behavior.
+ * The great advantages of the Echo algorithm, as opposed to similar algorithms (Tarry's, Cidon's) are how easy it is
+ * to intuit the algorithm's behavior; how readily the name "Echo" conveys that behavior; and the far greater speed of
+ * its operation, being a breadth-first search pattern in a distributed setting.
  *
  * The initiator sends <wave>s to all neighbors. A process sets its parent to be the first process it received a <wave>
  * from, and then propagates the <wave> further out. If a process has received messages from all neighbors, it returns

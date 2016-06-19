@@ -11,7 +11,7 @@ define([
         new Sample('Template'      , '_Template.js'    , 'generic'),
         new Sample('Chandy-Lamport', 'ChandyLamport.js', 'generic'),
         new Sample('Chandy-Misra'  , 'ChandyMisra.js'  , 'generic'),
-        new Sample('Chang-Roberts' , 'ChangRoberts.js' , 'directed'),
+        //new Sample('Chang-Roberts' , 'ChangRoberts.js' , 'directed'),
         new Sample("Cidon's"       , 'Cidon.js'        , 'generic'),
         new Sample('Echo'          , "EchoAlgorithm.js", 'generic'),
         new Sample("Franklin's"    , 'Franklin.js'     , 'ring'),
