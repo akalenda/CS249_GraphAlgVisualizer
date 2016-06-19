@@ -1,5 +1,22 @@
 /*
- * @fileoverview Cidon's depth-first search algorithm
+ * @fileoverview Cidon's depth-first search algorithm, as described in Wan Fokkink's "Distributed Algorithms: An
+ * Intuitive Approach".
+ *
+ * There are three rules for the algorithm:
+ * 1. A process never forwards the token through the same channel twice.
+ * 2. A process only forwards the token to its parent when there is no other option.
+ * 3. When a process receives the token, it immediately sends it back through the same channel if this is allowed by
+ *    rules 1 and 2.
+ *
+ * The design of the algorithm has the following lineage:
+ * 1. Tarry's algorithm sends a token through the network, building a spanning tree rooted in the initiator. It does not
+ *    do so in any particular way. It may do so in the pattern of a depth-first search, breadth-first, or a combination
+ *    of the two. Tarry's algorithm consists of rules 1 and 2.
+ * 2. Awerbuch's algorithm modifies Tarry's algorithm to enforce a depth-first search pattern by adding rule 3. A
+ *    process will not send a token forward to a neighbor until it has informed its other neighbors that it has received
+ *    the token AND until it has received acknowledgements from those neighbors.
+ * 3. Cidon's algorithm makes a minor improvement by not unnecessarily waiting for acknowledgements from neighbors
+ *    before sending the token onward.
  */
 
 //noinspection JSUnresolvedFunction
@@ -10,35 +27,22 @@ randomizeProcessTimes(); // optional
 //noinspection JSUnresolvedFunction
 onInitializationDo(
     /**
-     * When the simulation initializes, the code provided here will execute on every process `p` in the network
      * @param {Process} p
      */
     function (p) {
-        /**
-         * @type {boolean}
-         */
         p.info = false;
-
-        /**
-         * @type {Array<boolean>}
-         */
         p.token = [];
+        p.forward = null;
+
         p.forEachOutgoingChannel(function(r){
             p.token[r] = false;
         });
-
-        /**
-         * Stringification of a Process
-         * @type {String}
-         */
-        p.forward = null;
     }
 );
 
 //noinspection JSUnresolvedFunction
 onInitiationDo(
     /**
-     * When an initiator `p` decides to start the algorithm, the code provided here will be executed
      * @param {Process} p
      */
     function (p) {
@@ -49,10 +53,13 @@ onInitiationDo(
 //noinspection JSUnresolvedFunction
 onReceivingMessageDo(
     /**
-     * When a process `p` in the network receives a message through a channel `q`, the code provided here will be executed
-     * @param {Process} p
-     * @param {string} message
-     * @param {String} q
+     * @param {Process} p - the current process which has received the message
+     * @param {boolean} p.info - true if <info> messages have been sent already
+     * @param {string} p.forward - the name of the neighbor to which p has forwarded the token
+     * @param {Map<Boolean>} p.token - `p[q] == true` signifies that p has received a token from q
+     * @param {string} message - <token> messages propagate through the network, forming the lines of the tree. <info>
+     *     messages are sent to neighbors to notify them that the token has already been received.
+     * @param {String} q - the name of the neighboring process from which the message was received
      */
     function (p, message, q) {
         if (message == "<info>") {
@@ -74,6 +81,12 @@ onReceivingMessageDo(
     }
 );
 
+/**
+ * @param {Process} p
+ * @param {boolean} p.info
+ * @param {string} p.forward
+ * @param {Map<Boolean>} p.token
+ */
 function forwardToken(p) {
     var neighborsThatHaveNotReceivedToken = p.getOutgoingChannels().filter(function(r){ return p.token[r] == false; });
     if (neighborsThatHaveNotReceivedToken.length > 0) {
@@ -94,6 +107,10 @@ function forwardToken(p) {
     }
 }
 
+/**
+ * @param {Array<*>} array
+ * @returns {*}
+ */
 function chooseArbitarilyFrom(array) {
     return array[parseInt(Math.random() * (array.length - 1))];
 }
