@@ -196,7 +196,20 @@ define([
         };
 
         this.graph_export = function graph_export(){
-            debugger;
+            var exported = {
+                vertices: [],
+                edges: [],
+                initiators: []
+            };
+            Vertex.list.forEach(function exportV(vertex){
+                exported.vertices.push(vertex.export());
+                if (vertex.isInitiator())
+                    exported.initiators.push(vertex.getID());
+                vertex.outgoingEdges.forEach(function exportE(edge){
+                    exported.edges.push(edge.export());
+                });
+            });
+            
         };
 
         /* *************************** Code mirror stuff *****************************************/

@@ -48,6 +48,20 @@ define([
     };
 
     /**
+     * Produces an object with the minimal description necessary to reproduce this edge: the IDs of the vertices the
+     * edge starts and ends on, and whether the edge is undirected.
+     *
+     * @returns {{start: number, end: number, isUndirected: boolean}}
+     */
+    Edge.prototype.export = function exprt() {
+        return {
+            start: this.startVertex.getID(),
+            end: this.endVertex.getID(),
+            isUndirected : this.isUndirected
+        };
+    };
+
+    /**
      * Updates the SVG drawn line for this edge, e.g. when the Vertices are moved this can (and should) be invoked to have the line redrawn to track it
      */
     Edge.prototype.updateGfxElements = function updateGfxElements(){

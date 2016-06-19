@@ -83,6 +83,18 @@ define([
         });
     };
 
+    /**
+     * Returns an object with the minimum necessary in order to reproduce this vertex (edges not included): the x-y
+     * coordinates of the vertex, and its ID.
+     *
+     * @returns {{x: {number}, y: {number}, id: {number}}}
+     */
+    Vertex.prototype.export = function exprt(){
+        var xport = this.getCoordinatesOfCenter();
+        xport.id = this.getID();
+        return xport;
+    };
+
     /* ************************ GUI stuff *****************************************************/
 
     /**
