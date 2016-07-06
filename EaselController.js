@@ -32,6 +32,7 @@ define([
             smartIndent : true,
             lineNumbers : true
         });
+        $('[data-toggle="popover"]').popover();
 
         /* ************************* Initialize the controller with sample algorithms ********************/
         this.samples = Registry.listing;
@@ -79,6 +80,31 @@ define([
         this.enterMode_removeEdges      = function enterMode_removeEdges     () {currentMode = mode_removeEdges     ;};
         this.enterMode_markInitiators   = function enterMode_markInitiators  () {currentMode = mode_markInitiators  ;};
         this.enterMode_unmarkInitiators = function enterMode_unmarkInitiators() {currentMode = mode_unmarkInitiators;};
+
+        this.graph_generate = function graph_generate(graphType){
+            debugger;
+        };
+
+        this.graph_import = function graph_import(stringification){
+            debugger;
+        };
+
+        this.graph_export = function graph_export(){
+            var exported = {
+                vertices: [],
+                edges: [],
+                initiators: []
+            };
+            Vertex.list.forEach(function exportV(vertex){
+                exported.vertices.push(vertex.export());
+                if (vertex.isInitiator())
+                    exported.initiators.push(vertex.getID());
+                vertex.outgoingEdges.forEach(function exportE(edge){
+                    exported.edges.push(edge.export());
+                });
+            });
+
+        };
 
         /* ********************************** Define functionalities ********************************************/
 
@@ -186,31 +212,6 @@ define([
         function unmarkInitiator(ignored, vertex) {
             vertex.unmarkAsInitiator();
         }
-
-        this.graph_generate = function graph_generate(graphType){
-            debugger;
-        };
-
-        this.graph_import = function graph_import(stringification){
-            debugger;
-        };
-
-        this.graph_export = function graph_export(){
-            var exported = {
-                vertices: [],
-                edges: [],
-                initiators: []
-            };
-            Vertex.list.forEach(function exportV(vertex){
-                exported.vertices.push(vertex.export());
-                if (vertex.isInitiator())
-                    exported.initiators.push(vertex.getID());
-                vertex.outgoingEdges.forEach(function exportE(edge){
-                    exported.edges.push(edge.export());
-                });
-            });
-            
-        };
 
         /* *************************** Code mirror stuff *****************************************/
         this.alg_load = function alg_load(path){
