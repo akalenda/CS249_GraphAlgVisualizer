@@ -11,5 +11,6 @@
     <orderEntry type="library" name="easeljs-0.8.0" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
     <orderEntry type="library" name="require" level="application" />
+    <orderEntry type="library" name="AngularJS" level="project" />
   </component>
 </module>

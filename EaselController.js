@@ -33,11 +33,13 @@ define([
             lineNumbers : true
         });
         $('[data-toggle="popover"]').popover();
+        var exportButton = $('#exportButton');
+        exportButton.on('show.bs.popover', updateExportPopoverText);
 
         /* ************************* Initialize the controller with sample algorithms ********************/
         this.samples = Registry.listing;
 
-        /* *********************************** Define modalities **************************************/
+        /* *********************************** Define modality **************************************/
         var mode_placeVertices = {
             clickOnEmpty: createVertex,
             dragFromVertex: moveVertex
@@ -87,23 +89,6 @@ define([
 
         this.graph_import = function graph_import(stringification){
             debugger;
-        };
-
-        this.graph_export = function graph_export(){
-            var exported = {
-                vertices: [],
-                edges: [],
-                initiators: []
-            };
-            Vertex.list.forEach(function exportV(vertex){
-                exported.vertices.push(vertex.export());
-                if (vertex.isInitiator())
-                    exported.initiators.push(vertex.getID());
-                vertex.outgoingEdges.forEach(function exportE(edge){
-                    exported.edges.push(edge.export());
-                });
-            });
-
         };
 
         /* ********************************** Define functionalities ********************************************/
@@ -307,6 +292,23 @@ define([
             for (var i = objs.length - 1; i >= 0; i--)
                 if (objs[i].owningVertex)
                     return objs[i].owningVertex;
+        }
+
+        function updateExportPopoverText(data1, data2, data3){
+            var exported = {
+                v: [],
+                e: [],
+                i: []
+            };
+            Vertex.list.forEach(function exportV(vertex){
+                exported.v.push(vertex.export());
+                if (vertex.isInitiator())
+                    exported.i.push(vertex.getID());
+                vertex.outgoingEdges.forEach(function exportE(edge){
+                    exported.e.push(edge.export());
+                });
+            });
+            exportButton.attr('data-content', JSON.stringify(exported));
         }
     });
 });

@@ -55,9 +55,9 @@ define([
      */
     Edge.prototype.export = function exprt() {
         return {
-            start: this.startVertex.getID(),
-            end: this.endVertex.getID(),
-            isUndirected : this.isUndirected
+            s: this.startVertex.getID(),
+            e: this.endVertex.getID(),
+            u: this.isUndirected
         };
     };
 

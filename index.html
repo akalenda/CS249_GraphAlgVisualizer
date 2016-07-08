@@ -41,8 +41,8 @@
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
-        <button type="button" class="btn btn-export"  ng-click="easelCtrl.graph_export()" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Error">Export</button>
-        <button type="button" class="btn btn-export"  ng-click="easelCtrl.graph_import              ()">Import</button>
+        <button type="button" class="btn btn-export"  id="exportButton" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Error">Export</button>
+        <button type="button" class="btn btn-export"  ng-click="easelCtrl.graph_import()" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Error">Import</button>
     </div>
 
     <div>
