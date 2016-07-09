@@ -4,11 +4,12 @@ define([
     "CodeEnclosure",
     'jquery',
     "bootstrap",
-    "Sample"
-], function (Vertex, ProtoEdge, CodeEnclosure, $, bootstrap, Registry) {
+    "Sample",
+    "Edge"
+], function (Vertex, ProtoEdge, CodeEnclosure, $, bootstrap, Sample, Edge) {
     'use strict';
 
-    var module = angular.module('GraphAlgVisualizer', []);
+    var module = angular.module('GraphAlgVisualizer', ['ngAnimate', 'ui.bootstrap']);
 
     angular.element(document).ready(function () {
         angular.bootstrap(document, ['GraphAlgVisualizer']);
@@ -20,7 +21,20 @@ define([
      */
     module.controller('EaselController', function easelConstructor() {
 
-        /* *************************** Initialize the controller w/ easel **************************************/
+        var that = this;
+
+        /**
+         * We only ever need one: The one that the user is currently drawing, or none at all.
+         * @type {ProtoEdge}
+         */
+        var protoEdge;
+
+        /* *************************** AngularJS values **********************************************/
+        this.samples = Sample.listing;
+        this.exportText = "error";
+        this.importText = "";
+
+        /* *************************** Initialize EaselJS and CodeMirror **************************************/
         var stage = new createjs.Stage("mainCanvas");
         Vertex.useStage(stage);
         setStageListeners();
@@ -32,14 +46,11 @@ define([
             smartIndent : true,
             lineNumbers : true
         });
-        $('[data-toggle="popover"]').popover();
-        var exportButton = $('#exportButton');
-        exportButton.on('show.bs.popover', updateExportPopoverText);
-
-        /* ************************* Initialize the controller with sample algorithms ********************/
-        this.samples = Registry.listing;
 
         /* *********************************** Define modality **************************************/
+        /* These modes decide what happens when the user clicks or drags on the easel.
+            Various buttons at the top of the app allow the user to switch between modes.
+         */
         var mode_placeVertices = {
             clickOnEmpty: createVertex,
             dragFromVertex: moveVertex
@@ -83,21 +94,131 @@ define([
         this.enterMode_markInitiators   = function enterMode_markInitiators  () {currentMode = mode_markInitiators  ;};
         this.enterMode_unmarkInitiators = function enterMode_unmarkInitiators() {currentMode = mode_unmarkInitiators;};
 
-        this.graph_generate = function graph_generate(graphType){
-            debugger;
-        };
+        /* ******************** Graph button functions *******************************************/
+        /* These are the buttons that, rather than activating different modes for the canvas, have an immediate effect.
+            Some are called by other functions as well, it's not 1-to-1 with the user's button clicks.
+         */
 
-        this.graph_import = function graph_import(stringification){
-            debugger;
-        };
-
-        /* ********************************** Define functionalities ********************************************/
-
+        /**
+         * Reverts the graph to its initial blank state, with neither vertices nor edges.
+         */
         this.resetStage = function resetStage() {
             stage.removeAllChildren();
             stage.clear();
             Vertex.list.reset();
         };
+
+        /**
+         * Imports a prefabricated graph; used in the Load Samples menu.
+         *
+         * @param {string} graphType - Must correspond to one of the keys in `Sample.graphs`'s key-value pairs
+         */
+        this.graph_generate = function graph_generate(graphType){
+            this.graph_import(Sample.graphs[graphType]);
+        };
+
+        /**
+         * Takes a stringification, as produced by {@link updateExportText}, and produces a working graph. If none is
+         * provided as the argument, it will retrieve any text provided by the user in the Import popover.
+         *
+         * @param {string} [stringification]
+         */
+        this.graph_import = function graph_import(stringification){
+            stringification = stringification || this.importText;
+            var imported = JSON.parse(stringification);
+            this.resetStage();
+            imported.v.forEach(function(vertex){
+                createVertex(vertex.x, vertex.y);
+            });
+            imported.e.forEach(function(edge){
+                var startingVertex = Vertex.list.find(function(vertex){
+                    return vertex.getID() == edge.s;
+                });
+                var endingVertex = Vertex.list.find(function(vertex){
+                    return vertex.getID() == edge.e;
+                });
+                new Edge(startingVertex, endingVertex);
+            });
+            imported.i.forEach(function(vertexID){
+                Vertex.list.find(function(vertex){
+                    return vertex.getID() == vertexID;
+                }).markAsInitiator();
+            });
+            stage.update();
+        };
+
+        /**
+         * Revises the text found in the Export popover window to reflect the graph currently on screen. This can
+         * later be used with the Import function to reproduce the graph.
+         */
+        this.updateExportText = function updateExportText(){
+            var exported = {
+                v: [],
+                e: [],
+                i: []
+            };
+            Vertex.list.forEach(function exportV(vertex){
+                exported.v.push(vertex.export());
+                if (vertex.isInitiator())
+                    exported.i.push(vertex.getID());
+                vertex.outgoingEdges.forEach(function exportE(edge){
+                    exported.e.push(edge.export());
+                });
+            });
+            that.exportText = JSON.stringify(exported);
+        };
+
+        /* *************************** Algorithm button functions *****************************************/
+        /* These also correspond to specific buttons the user may click, but are related to whatever algorithm the
+            user has entered, or imported, into CodeMirror.
+         */
+        /**
+         * Invoked when the user clicks a Code button in the Load Samples menu. Retrieves a JavaScript file from the
+         * server and loads it into CodeMirror.
+         *
+         * @param {String} path - Path to a *.js file
+         */
+        this.alg_load = function alg_load(path){
+            $.ajax({
+                url: "samples/" + path,
+                success: function(response){
+                    codeMirror.setValue(response);
+                },
+                error: function(response){
+                    if (response.responseText)
+                        codeMirror.setValue(response.responseText);
+                }
+            });
+        };
+
+        /**
+         * Resets the graph vertices and edges so that it is as though the algorithm had never been run
+         */
+        this.alg_reset = function alg_reset(){
+            Vertex.list.forEach(function(vertex){
+                vertex.sim_reset();
+            });
+            stage.update();
+        };
+
+        /**
+         * Begins a simulation using whatever code has been given
+         */
+        this.alg_run = function alg_run(){
+            Vertex.useCodeEnclosure(new CodeEnclosure(codeMirror.getValue()));
+            Vertex.list.forEach(function(vertex){
+                vertex.sim_initialize();
+            });
+            Vertex.list.getInitiators().forEach(function(vertex){
+                vertex.sim_initiate();
+            });
+        };
+
+        /* ****************************** Internal functions for drawing the graph ********************* */
+        /* When the user clicks on the canvas, one of these functions is eventually invoked. The listener for that
+            click is is set in `setStageListeners()`, while the function that actually gets called is determined by
+            `currentMode`.
+         */
 
         /**
          * @param {number} xCoord
@@ -123,8 +244,6 @@ define([
         function removeVertex(ignored, vertex) {
             vertex.remove();
         }
-
-        var protoEdge;
 
         /**
          * @param ignored
@@ -198,43 +317,6 @@ define([
             vertex.unmarkAsInitiator();
         }
 
-        /* *************************** Code mirror stuff *****************************************/
-        this.alg_load = function alg_load(path){
-            $.ajax({
-                url: "samples/" + path,
-                success: function(response){
-                    codeMirror.setValue(response);
-                },
-                error: function(response){
-                    if (response.responseText)
-                        codeMirror.setValue(response.responseText);
-                }
-            });
-        };
-
-        /**
-         * Resets the graph vertices and edges so that it is as though the algorithm had never been run
-         */
-        this.alg_reset = function alg_reset(){
-            Vertex.list.forEach(function(vertex){
-                vertex.sim_reset();
-            });
-            stage.update();
-        };
-
-        /**
-         * Begins a simulation using whatever code has been given
-         */
-        this.alg_run = function alg_run(){
-            Vertex.useCodeEnclosure(new CodeEnclosure(codeMirror.getValue()));
-            Vertex.list.forEach(function(vertex){
-                vertex.sim_initialize();
-            });
-            Vertex.list.getInitiators().forEach(function(vertex){
-                vertex.sim_initiate();
-            });
-        };
-
         /* ********************************* Helpers ******************************************/
 
         /**
@@ -292,23 +374,6 @@ define([
             for (var i = objs.length - 1; i >= 0; i--)
                 if (objs[i].owningVertex)
                     return objs[i].owningVertex;
-        }
-
-        function updateExportPopoverText(data1, data2, data3){
-            var exported = {
-                v: [],
-                e: [],
-                i: []
-            };
-            Vertex.list.forEach(function exportV(vertex){
-                exported.v.push(vertex.export());
-                if (vertex.isInitiator())
-                    exported.i.push(vertex.getID());
-                vertex.outgoingEdges.forEach(function exportE(edge){
-                    exported.e.push(edge.export());
-                });
-            });
-            exportButton.attr('data-content', JSON.stringify(exported));
         }
     });
 });

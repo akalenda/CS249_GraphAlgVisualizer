@@ -4,6 +4,16 @@ define([
 ], function(Vertex, Edge){
 
     /**
+     * As the name implies, this is the precursor to an actual {@link Edge}.
+     *
+     * The reason for this is that while the user is drawing an Edge, it does not actually exist. Therefore we want to
+     * make the act of drawing it a separate concern. A drawn edge may lead nowhere, or may form a duplicate edge;
+     * in either case we simply discard the ProtoEdge. If the drawn edge is valid, then the ProtoEdge completes, an
+     * Edge is created, and the ProtoEdge is discarded.
+     *
+     * Furthermore, a ProtoEdge may be used for other things. For example, in Remove Edges mode, a ProtoEdge, when
+     * completed, removes any edges from the starting to ending vertex.
+     *
      * @param {Vertex} startVertex
      * @constructor
      */

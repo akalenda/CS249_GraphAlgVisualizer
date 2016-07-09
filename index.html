@@ -13,6 +13,8 @@
     <script src="libraries/codemirror.min.js"></script>
 
     <script src="libraries/angular.min.js"></script>
+    <script src="libraries/angular-animate.min.js"></script>
+    <script src="libraries/ui-bootstrap-tpls-0.13.4.min.js"></script>
     <script src="libraries/easeljs-0.8.0.min.js"></script>
     <script data-main="main" src="libraries/require.min.js"></script>
 
@@ -41,8 +43,8 @@
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
-        <button type="button" class="btn btn-export"  id="exportButton" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Error">Export</button>
-        <button type="button" class="btn btn-export"  ng-click="easelCtrl.graph_import()" data-container="body" data-toggle="popover" data-placement="bottom" data-content="Error">Import</button>
+        <button type="button" class="btn btn-export" popover-template="'import.html'" popover-placement="bottom" popover-appendToBody="true">Import</button>
+        <button type="button" class="btn btn-export" popover-template="'export.html'" popover-placement="bottom" popover-appendToBody="true">Export</button>
     </div>
 
     <div>
@@ -51,7 +53,7 @@
 
     <div class="btn-group" role="group" aria-label="...">
         <button type="button" class="btn btn-danger" ng-click="easelCtrl.alg_reset()">Reset</button>
-        <button type="button" class="btn btn-info"   ng-click="easelCtrl.alg_run  ()">Run</button>
+        <button type="button" class="btn btn-run"    ng-click="easelCtrl.alg_run  ()">Run</button>
     </div>
 
 </body>

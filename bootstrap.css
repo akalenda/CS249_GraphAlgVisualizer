@@ -72,6 +72,23 @@
     border-color: #583876;
 }
 
+.btn-run {
+    color: #ffffff;
+    background-color: #468048;
+    border-color: #3a5e3b;
+}
+
+.btn-run:hover,
+.btn-run:focus,
+.btn-run.focus,
+.btn-run:active,
+.btn-run.active,
+.open > .dropdown-toggle.btn-run {
+    color: #ffffff;
+    background-color: #3a5e3b;
+    border-color: #3a5e3b;
+}
+
 /*!
  * bootswatch v3.3.4+1
  * Homepage: http://bootswatch.com
@@ -8394,4 +8411,11 @@ a.list-group-item-danger.active:focus {
 
 .panel-default > .panel-heading {
     background-color: #464545;
+}
+
+textarea,
+textarea.form-control{
+    background: #333333;
+    color: white;
+    font-family: monospace;
 }
