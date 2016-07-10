@@ -103,6 +103,7 @@ define([
          * Reverts the graph to its initial blank state, with neither vertices nor edges.
          */
         this.resetStage = function resetStage() {
+            this.alg_reset();
             stage.removeAllChildren();
             stage.clear();
             Vertex.list.reset();
