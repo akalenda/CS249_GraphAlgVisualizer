@@ -22,11 +22,9 @@
 <body ng-controller="EaselController as easelCtrl" style="background-color: #333333">
 
     <div class="btn-group" role="group" aria-label="...">
-        <div class="btn-group">
-            <button type="button" class="btn btn-warning dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Load Sample <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu sample-dropdown">
+        <div class="btn-group" dropdown autoclose="outsideClick">
+            <button type="button" class=" btn btn-warning dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Load Samples <span class="caret"></span></button>
+            <ul class="dropdown-menu dropdown-menu-left samples-dropdown" role="menu">
                 <li ng-repeat="sample in easelCtrl.samples">
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-loadSample-desc"  ng-click="">{{ sample.title }}</button>
@@ -45,6 +43,7 @@
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
         <button type="button" class="btn btn-export" popover-template="'import.html'" popover-placement="bottom" popover-appendToBody="true">Import</button>
         <button type="button" class="btn btn-export" popover-template="'export.html'" popover-placement="bottom" popover-appendToBody="true">Export</button>
+        <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer"><button type="button" class="btn btn-default">Visit Github repo</button></a>
     </div>
 
     <div>
@@ -55,12 +54,5 @@
         <button type="button" class="btn btn-danger" ng-click="easelCtrl.alg_reset()">Reset</button>
         <button type="button" class="btn btn-run"    ng-click="easelCtrl.alg_run  ()">Run</button>
     </div>
-
-    <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer">
-        <img style="position: absolute; top: 0; right: 0; border: 0;"
-             src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67"
-             alt="Fork me on GitHub"
-             data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
-    </a>
 </body>
 </html>

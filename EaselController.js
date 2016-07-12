@@ -3,10 +3,9 @@ define([
     "ProtoEdge",
     "CodeEnclosure",
     'jquery',
-    "bootstrap",
     "Sample",
     "Edge"
-], function (Vertex, ProtoEdge, CodeEnclosure, $, bootstrap, Sample, Edge) {
+], function (Vertex, ProtoEdge, CodeEnclosure, $, Sample, Edge) {
     'use strict';
 
     var module = angular.module('GraphAlgVisualizer', ['ngAnimate', 'ui.bootstrap']);
