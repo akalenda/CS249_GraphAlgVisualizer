@@ -15,7 +15,7 @@
     <script src="libraries/angular.min.js"></script>
     <script src="libraries/angular-animate.min.js"></script>
     <script src="libraries/ui-bootstrap-tpls-0.13.4.min.js"></script>
-    <script src="libraries/easeljs-0.8.0.min.js"></script>
+    <script src="libraries/easeljs-0.8.2.min.js"></script>
     <script data-main="main" src="libraries/require.min.js"></script>
 
 </head>
@@ -23,7 +23,8 @@
 
     <div class="btn-group" role="group" aria-label="...">
         <div class="btn-group" dropdown auto-close="outsideClick">
-            <button type="button" class=" btn btn-warning dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Load Samples <span class="caret"></span></button>
+            <button type="button" class=" btn btn-warning dropdown-toggle" dropdown-toggle role="button" aria-expanded="false" tooltip-placement="bottom"
+                    tooltip="A list of various interesting distributed algorithms. Click 'code' and 'graph' to load a sample of each.">Load Samples <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-left samples-dropdown" role="menu">
                 <li ng-repeat="sample in easelCtrl.samples">
                     <div class="btn-group" role="group">
@@ -34,15 +35,23 @@
                 </li>
             </ul>
         </div>
-        <button type="button" class="btn btn-danger"  ng-click="easelCtrl.resetStage                ()">Reset</button>
-        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_placeVertices   ()">Place vertices</button>
-        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_drawEdges       ()">Draw edges</button>
-        <button type="button" class="btn btn-info"    ng-click="easelCtrl.enterMode_markInitiators  ()">Mark initiators</button>
-        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
-        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
-        <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
+        <button type="button" class="btn btn-danger"  tooltip-placement="bottom" ng-click="easelCtrl.resetStage()"
+                tooltip="This will reset any algorithm that may be running and wipe the graph clean, removing all vertices, edges, and initiators.">Reset</button>
+        <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_placeVertices()"
+                tooltip="A vertex represents a process/node/machine in the network. Click to place, or drag to move already-existing vertices.">Place vertices</button>
+        <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_drawEdges()"
+                tooltip="An edge represents a channel between one process in the network and another, which may be used to send and receive messages. Simply click-and-drag from one vertex to another.">Draw edges</button>
+        <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_markInitiators()"
+                tooltip="Initiators are processes that are capable of starting a given algorithm. (Other processes simply propagate it.) Currently in our simulation, all initiators begin simultaneously when you click the Run button, but in reality they could (and would) start at arbitrarily disparate times.">Mark initiators</button>
+        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_removeVertices()"
+                tooltip="asdasd">Remove vertices</button>
+        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_removeEdges()"
+                tooltip="asdasd">Remove edges</button>
+        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_unmarkInitiators()"
+                tooltip="asdasd">Unmark initiators</button>
         <div class="btn-group" dropdown auto-close="outsideClick">
-            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Export <span class="caret"></span></button>
+            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false" tooltip-placement="bottom"
+                    tooltip="Retrieve a string representation of the graph currently on-screen. You can copy it and later import it.">Export <span class="caret"></span></button>
             <div class="dropdown-menu dropdown-menu-right" role="menu">
                 <div>
                     <label for="export-textarea">Copy and save the following:</label>
@@ -51,7 +60,8 @@
             </div>
         </div>
         <div class="btn-group" dropdown auto-close="outsideClick">
-            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Import <span class="caret"></span></button>
+            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false" tooltip-placement="bottom"
+                    tooltip="Input a string representation of a graph, as found in Export, to see it generated.">Import <span class="caret"></span></button>
             <div class="dropdown-menu dropdown-menu-right" role="menu">
                 <form>
                     <fieldset class="form-group">
@@ -62,7 +72,10 @@
                 </form>
             </div>
         </div>
-        <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer"><button type="button" class="btn btn-default">Visit Github repo</button></a>
+        <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer">
+            <button type="button" class="btn btn-default" tooltip-placement="bottom"
+                    tooltip="Visit the Github repository for this webapp!">Github</button>
+        </a>
     </div>
 
     <div>
