@@ -38,17 +38,11 @@
         <button type="button" class="btn btn-danger"  tooltip-placement="bottom" ng-click="easelCtrl.resetStage()"
                 tooltip="This will reset any algorithm that may be running and wipe the graph clean, removing all vertices, edges, and initiators.">Reset</button>
         <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_placeVertices()"
-                tooltip="A vertex represents a process/node/machine in the network. Click to place, or drag to move already-existing vertices.">Place vertices</button>
+                tooltip="A vertex represents a process/node/machine in the network. Click to place, or drag to move already-existing vertices. Shift-click to remove vertices.">Place vertices</button>
         <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_drawEdges()"
-                tooltip="An edge represents a channel between one process in the network and another, which may be used to send and receive messages. Simply click-and-drag from one vertex to another.">Draw edges</button>
+                tooltip="An edge represents a channel between one process in the network and another, which may be used to send and receive messages. Simply click-and-drag from one vertex to another. Shift-click-and-drag to remove edges.">Draw edges</button>
         <button type="button" class="btn btn-info"    tooltip-placement="bottom" ng-click="easelCtrl.enterMode_markInitiators()"
-                tooltip="Initiators are processes that are capable of starting a given algorithm. (Other processes simply propagate it.) Currently in our simulation, all initiators begin simultaneously when you click the Run button, but in reality they could (and would) start at arbitrarily disparate times.">Mark initiators</button>
-        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_removeVertices()"
-                tooltip="asdasd">Remove vertices</button>
-        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_removeEdges()"
-                tooltip="asdasd">Remove edges</button>
-        <button type="button" class="btn btn-primary" tooltip-placement="bottom" ng-click="easelCtrl.enterMode_unmarkInitiators()"
-                tooltip="asdasd">Unmark initiators</button>
+                tooltip="Initiators are processes that are capable of starting a given algorithm. (Other processes simply propagate it.) Currently in our simulation, all initiators begin simultaneously when you click the Run button, but in reality they could (and would) start at arbitrarily disparate times. Click on a vertex to mark it as an initiator. Shift-click to unmark an initiator.">Mark initiators</button>
         <div class="btn-group" dropdown auto-close="outsideClick">
             <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false" tooltip-placement="bottom"
                     tooltip="Retrieve a string representation of the graph currently on-screen. You can copy it and later import it.">Export <span class="caret"></span></button>
@@ -73,7 +67,7 @@
             </div>
         </div>
         <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer">
-            <button type="button" class="btn btn-default" tooltip-placement="bottom"
+            <button type="button" class="btn btn-primary" tooltip-placement="bottom"
                     tooltip="Visit the Github repository for this webapp!">Github</button>
         </a>
     </div>
@@ -83,8 +77,10 @@
     </div>
 
     <div class="btn-group" role="group" aria-label="...">
-        <button type="button" class="btn btn-danger" ng-click="easelCtrl.alg_reset()">Reset</button>
-        <button type="button" class="btn btn-run"    ng-click="easelCtrl.alg_run  ()">Run</button>
+        <button type="button" class="btn btn-danger" tooltip-placement="right" ng-click="easelCtrl.alg_reset()"
+                tooltip="Resets the simulation. The graph and code will remain, but it will be as though the Run button had never been clicked.">Reset</button>
+        <button type="button" class="btn btn-run"    tooltip-placement="right" ng-click="easelCtrl.alg_run()"
+                tooltip="Begins the simulation. This requires both a graph, an algorithm, and one or more initiators marked if and as the algorithm requires.">Run</button>
     </div>
 </body>
 </html>

@@ -21,6 +21,7 @@ define([
     module.controller('EaselController', function easelConstructor() {
 
         var that = this;
+        var shiftIsHeld = false;
 
         /**
          * We only ever need one: The one that the user is currently drawing, or none at all.
@@ -52,46 +53,32 @@ define([
          */
         var mode_placeVertices = {
             clickOnEmpty: createVertex,
-            dragFromVertex: moveVertex
-        };
-
-        var mode_removeVertices = {
-            clickOnVertex: removeVertex,
+            shiftClickOnVertex: removeVertex,
             dragFromVertex: moveVertex
         };
 
         var mode_drawEdges = {
             clickOnVertex: startDrawingEdge,
+            shiftClickOnVertex: startDrawingEdge,
+            shiftDragFromVertex: continueDrawingEdge,
             dragFromVertex: continueDrawingEdge,
             releaseOnVertex: createEdge,
-            releaseOnEmpty: cancelDrawingEdge
-        };
-
-        var mode_removeEdges = {
-            clickOnVertex: startDrawingEdge,
-            dragFromVertex: continueDrawingEdge,
-            releaseOnVertex: removeEdge,
-            releaseOnEmpty: cancelDrawingEdge
+            shiftReleaseOnVertex: removeEdge,
+            releaseOnEmpty: cancelDrawingEdge,
+            shiftReleaseOnEmpty: cancelDrawingEdge
         };
 
         var mode_markInitiators = {
             clickOnVertex: markInitiator,
-            dragFromVertex: moveVertex
-        };
-
-        var mode_unmarkInitiators = {
-            clickOnVertex: unmarkInitiator,
+            shiftClickOnVertex: unmarkInitiator,
             dragFromVertex: moveVertex
         };
 
         var currentMode = mode_placeVertices;
 
         this.enterMode_placeVertices    = function enterMode_placeVertices   () {currentMode = mode_placeVertices   ;};
-        this.enterMode_removeVertices   = function enterMode_removeVertices  () {currentMode = mode_removeVertices  ;};
         this.enterMode_drawEdges        = function enterMode_drawEdges       () {currentMode = mode_drawEdges       ;};
-        this.enterMode_removeEdges      = function enterMode_removeEdges     () {currentMode = mode_removeEdges     ;};
         this.enterMode_markInitiators   = function enterMode_markInitiators  () {currentMode = mode_markInitiators  ;};
-        this.enterMode_unmarkInitiators = function enterMode_unmarkInitiators() {currentMode = mode_unmarkInitiators;};
 
         /* ******************** Graph button functions *******************************************/
         /* These are the buttons that, rather than activating different modes for the canvas, have an immediate effect.
@@ -335,6 +322,9 @@ define([
                     stage.update();
                 }
             });
+            $(document).on('keyup keydown', function(event) {
+                shiftIsHeld = event.shiftKey;
+            });
         }
 
         /**
@@ -345,9 +335,9 @@ define([
         function vertexListener(event, vertex) {
             var foo;
             switch (event.type) {
-                case 'click'     : foo = currentMode.clickOnVertex  ; break;
-                case 'pressmove' : foo = currentMode.dragFromVertex ; break;
-                case 'pressup'   : foo = currentMode.releaseOnVertex; break;
+                case 'click'     : foo = (shiftIsHeld) ? currentMode.shiftClickOnVertex   :  currentMode.clickOnVertex  ; break;
+                case 'pressmove' : foo = (shiftIsHeld) ? currentMode.shiftDragFromVertex  :  currentMode.dragFromVertex ; break;
+                case 'pressup'   : foo = (shiftIsHeld) ? currentMode.shiftReleaseOnVertex :  currentMode.releaseOnVertex; break;
                 default          : console.warn("Warning: Unsupported mouse action '" + event.type + "' originating from vertex " + vertex.toString());
             }
             if (foo)
