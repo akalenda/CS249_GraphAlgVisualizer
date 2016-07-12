@@ -4,16 +4,20 @@
  * the algorithm.
  *
  * The purpose of the algorithm is to view the network as a tree, and determine what the root of that tree should be
- * based on how quickly messages from all of the network processes can reach it. That is to say, if each child process
+ * based on how quickly messages from all of the network processes can reach it. Incidentally, if each child process
  * has a weight equal to the time it took for its own children's messages to arrive, a nominally balanced tree is
  * produced. It is a peculiarity of this algorithm that it always produces two candidate roots.
  *
  * Another consequence of this algorithm's construction is that the graph must be an actual tree, and thus there can be
  * no cycles within the network graph. Otherwise it would be impossible for the algorithm to terminate. You can see this
- * yourself -- try running it on a number of graphs that contain cycles.
+ * yourself -- try running it on a graph with no cycles, and then add an edge on that graph to create a cycle.
  *
- * Therefore, another slower algorithm -- Tarry's, Awerbuch's, Cidon's, or the Echo algorithm -- must be used for such
- * a network.
+ * For graphs with cycles, another slower algorithm -- Tarry's, Awerbuch's, Cidon's, or the Echo algorithm -- must be
+ * used to construct a tree spanning the network. And in each of these cases, the root must be predetermined.
+ *
+ * If this is a problem, my own suggestion is to use one of those slower algorithms to construct a "first-iteration"
+ * tree. Then a second graph is constructed, using only the channels in the first tree, upon which the Tree algorithm
+ * is then used to select a better root.
  */
 
 //noinspection JSUnresolvedFunction

@@ -5,11 +5,15 @@
  *
  * At first this may appear similar to the Echo algorithm. However, Echo will not make alterations to the tree after
  * parents have first been set. Chandy-Misra is designed for many consecutive executions of the algorithm without a
- * reset, which may even execute on top of one another. This is most apparent in a densely connected graph. It is also
- * more robust in handling processes in the networks coming and going on- and off-line.
+ * reset, which may even execute on top of one another. It is also more robust in handling processes in the networks
+ * coming and going on- and off-line.
  *
- * Properly, it would be accompanied by a termination detection algorithm such as Djikstra-Scholten's, however, for the
- * purposes of this application visual confirmation is good enough to understand Chandy-Misra's workings.
+ * To see how this, imagine that a direct channel from the initiator to a far-off process were suddenly opened. You can
+ * simulate this by drawing such an edge yourself. See how the "parents" differ before and after this
+ * channel has been added.
+ *
+ * Properly, the algorithm would be accompanied by a termination detection algorithm such as Djikstra-Scholten's.
+ * However, for the purposes of this application visual confirmation is good enough to understand Chandy-Misra's workings.
  */
 
 //noinspection JSUnresolvedFunction

@@ -7,11 +7,9 @@
  *
  * One of the weaknesses with the algorithm is that the channels (edges) between processes (vertices) must be First In
  * First Out (FIFO) if it is to support more than one snapshot. (Currently the visualizer has no way of demonstrating
- * this.)
+ * the necessity of this.)
  */
 
-//noinspection JSUnresolvedFunction
-randomizeTraversalTimes();
 //noinspection JSUnresolvedFunction
 randomizeProcessTimes();
 

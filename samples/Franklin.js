@@ -2,9 +2,10 @@
  * @fileoverview Franklin's election algorithm for undirected rings, as described in Wan Fokkink's "Distributed
  * Algorithms: An Intuitive Approach".
  *
- * The purpose of this algorithm is to elect a "leader" process from amongst themselves without knowing anything of one
- * another. It could be used for similar contexts as the Tree algorithm, however it is specifically designed for ring
- * graphs: Graphs consisting entirely of one big cycle, with each vertex connected to exactly two others.
+ * The purpose of this algorithm is for the processes to elect a "leader" process from amongst themselves without
+ * knowing anything of one another. It could be used for similar contexts as the Tree algorithm, however it is
+ * specifically designed for ring graphs: Graphs consisting entirely of one big cycle, with each vertex connected to
+ * exactly two others.
  */
 
 //noinspection JSUnresolvedFunction
