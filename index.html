@@ -22,7 +22,7 @@
 <body ng-controller="EaselController as easelCtrl" style="background-color: #333333">
 
     <div class="btn-group" role="group" aria-label="...">
-        <div class="btn-group" dropdown autoclose="outsideClick">
+        <div class="btn-group" dropdown auto-close="outsideClick">
             <button type="button" class=" btn btn-warning dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Load Samples <span class="caret"></span></button>
             <ul class="dropdown-menu dropdown-menu-left samples-dropdown" role="menu">
                 <li ng-repeat="sample in easelCtrl.samples">
@@ -41,8 +41,27 @@
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeVertices  ()">Remove vertices</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_removeEdges     ()">Remove edges</button>
         <button type="button" class="btn btn-primary" ng-click="easelCtrl.enterMode_unmarkInitiators()">Unmark initiators</button>
-        <button type="button" class="btn btn-export" popover-template="'import.html'" popover-placement="bottom" popover-appendToBody="true">Import</button>
-        <button type="button" class="btn btn-export" popover-template="'export.html'" popover-placement="bottom" popover-appendToBody="true">Export</button>
+        <div class="btn-group" dropdown auto-close="outsideClick">
+            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Export <span class="caret"></span></button>
+            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                <div>
+                    <label for="export-textarea">Copy and save the following:</label>
+                    <textarea id="export-textarea" class="popover-content" rows="6" ng-init="easelCtrl.updateExportText()" ng-model="easelCtrl.exportText"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="btn-group" dropdown auto-close="outsideClick">
+            <button type="button" class=" btn btn-export dropdown-toggle" dropdown-toggle role="button" aria-expanded="false">Import <span class="caret"></span></button>
+            <div class="dropdown-menu dropdown-menu-right" role="menu">
+                <form>
+                    <fieldset class="form-group">
+                        <label for="import-textarea">Paste graph:</label>
+                        <textarea class="form-control" id="import-textarea" ng-model="easelCtrl.importText" rows="3"></textarea>
+                    </fieldset>
+                    <button type="submit" class="btn btn-primary" ng-click="easelCtrl.graph_import()">Submit</button>
+                </form>
+            </div>
+        </div>
         <a href="https://github.com/akalenda/CS249_GraphAlgVisualizer"><button type="button" class="btn btn-default">Visit Github repo</button></a>
     </div>
 
