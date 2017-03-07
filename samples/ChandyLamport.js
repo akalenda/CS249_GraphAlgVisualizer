@@ -12,6 +12,7 @@
 
 //noinspection JSUnresolvedFunction
 randomizeProcessTimes();
+randomizeTraversalTimes();
 
 //noinspection JSUnresolvedFunction
 onInitializationDo(function (p) {
