@@ -14,8 +14,7 @@ An Intuitive Approach" by Wan Fokkink.
 
 These are algorithms that span multiple processes. This may be through 
 shared memory, where independent processes can read and write to the 
-same memory. An example of this would 
-be [Dwarf Fortress][1]+[Dwarf Therapist][2].
+same memory.
 
 The other way is through message passing, where two processes 
 communicate through a port, perhaps on a local- or wide-area 
@@ -79,7 +78,6 @@ Yes! (・▽・)
 ...Yes (ﾟヘﾟ)？
 
 [1]: http://www.bay12games.com/dwarves/
-[2]: https://github.com/splintermind/Dwarf-Therapist
 [3]: https://angularjs.org/
 [4]: http://www.createjs.com/EaselJS
 [5]: https://codemirror.net/
