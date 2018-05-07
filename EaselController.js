@@ -365,8 +365,5 @@ define([
                 if (objs[i].owningVertex)
                     return objs[i].owningVertex;
         }
-
-        /* **************************** Final setup *******************************************/
-        this.alg_load('_Template.js');
     });
 });
